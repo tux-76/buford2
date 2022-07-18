@@ -9,15 +9,15 @@
 
 var bu2_debug_doDebug = true;
 
-function bu2_debug_log(func, descriptor, message) {
-	if (bu2_debug_doDebug) console.log("%cDEBUG|%c|" + func + "|%c|" + descriptor + ":", "color: #ff0000", "color:#079127", "color:#2c9c90", message);
+function bu2_debug_log(funcName, descriptor, message) {
+	if (bu2_debug_doDebug) console.log("%cDEBUG|%c|" + funcName + "|%c|" + descriptor + ":", "color: #ff0000", "color:#079127", "color:#2c9c90", message);
 }
 
-function bu2_debug_group(func) {
-	if (bu2_debug_doDebug) console.group("%cDEBUG|%c|" + func, "color: #ff0000", "color:#2c9c90");
+function bu2_debug_group(funcName) {
+	if (bu2_debug_doDebug) console.group("%cDEBUG|%c|" + funcName, "color: #ff0000", "color:#2c9c90");
 }
-function bu2_debug_groupC(func) {
-	if (bu2_debug_doDebug) console.groupCollapsed("%cDEBUG|%c|" + func, "color: #ff0000", "color:#2c9c90");
+function bu2_debug_groupC(funcName) {
+	if (bu2_debug_doDebug) console.groupCollapsed("%cDEBUG|%c|" + funcName, "color: #ff0000", "color:#2c9c90");
 }
 function bu2_debug_groupEnd() {
 	if (bu2_debug_doDebug) console.groupEnd();
@@ -275,6 +275,7 @@ class bu2_MathematicalConstant {
 //---------------------------------------------------------------------------------operation array
 class bu2_OperationArray extends Array {
 	exponent = 1;
+	sorted = false;
 
 	constructor (slicedArray, nextClass) {
 		if (slicedArray instanceof Array) { //expected input
@@ -339,6 +340,7 @@ class bu2_TermArray extends bu2_OperationArray {
 			
 			bu2_debug_groupEnd(); //debug
 		} else if (arg1 instanceof Array) {
+			super(0);
 			arg1.map((e, i) => this[i] = e);
 		} else super(arg1); //acception handling for other input
 	} //constructor
@@ -359,9 +361,15 @@ class bu2_FactorArray extends bu2_OperationArray {
 			
 			bu2_debug_groupEnd(); //debug
 		} else if (arg1 instanceof Array) {
+			super(0);
 			arg1.map((e, i) => this[i] = e);
 		} else super(arg1); //acception handling for other input
 	} //constructor
+
+	getCoefficients() {
+		if (!sorted) bu2_simplify_sort(this);
+		return this.slice(1);
+	}
 }
 
 
@@ -376,15 +384,46 @@ class bu2_FactorArray extends bu2_OperationArray {
 *DESC: Adds the given arguements if possible, returns a term array if not.
 */
 function bu2_simplify_add(...terms) {
-	let returnArray = new bu2_TermArray(0);
-	
-	for (termI=0;termI<terms.length-1;termI++) {
-		
+	bu2_debug_groupC("bu2_simplify_add");
+
+	//check if the output must be a term array
+	let outputTermArray = false;
+	terms.forEach(addend => {if (isNaN(addend)) outputTermArray = true;}); //if not every element is number: output term array true
+
+	bu2_debug_log("bu2_simplify_add", "outputTermArray?", outputTermArray);
+	if (outputTermArray) { //if the output is a term array
+		//make output a term array without any straight ints (replaced with constants)
+		terms = new bu2_TermArray(terms.map(term => isNaN(term) ? term : new bu2_MathematicalConstant(term)));
+		bu2_simplify_sort(terms);
+		//simplify the term array
+		bu2_simplify_termSimplify(terms);
+
+		bu2_debug_groupEnd();
+		bu2_debug_log("bu2_simplify_add", "OUT", terms);
+		return terms;
+	}
+
+	else { //if all terms are numbers
+		//set a sum and add all of them
+		let sum = 0;
+		terms.forEach(addend => sum += addend);
+
+		bu2_debug_groupEnd();
+		bu2_debug_log("bu2_simplify_add", "OUT", sum);
+		return sum;
 	}
 }
 
+/* --------------------------------------------------------------------------------------------------------------termSimplify
+*IN: Any instance of a term array
+*DESC: Psuedo:
+	~
+*/
+function bu2_simplify_termSimplify(termArray) {
 
-/* ---------------------------------------------------------------------------------------------------------------factorSimplifyLight
+}
+
+/* ---------------------------------------------------------------------------------------------------------------factorSimplify
 *IN: Any instance of a factor array
 *DESC: Loops through the factor array. It will catagorize each element by MathematicalConstant, MathematicalVariable, and OperationArray.
 	*If it is a constant it will be multiplied by the constant variable (which will be put at the front of the output array).
@@ -393,19 +432,22 @@ function bu2_simplify_add(...terms) {
 	*If it is an operation array then it will sort it, and then check for matches in the same manner as the variable.
 *BUGS: Cannot add exponents that are not of primary int value.
 */
-function bu2_simplify_factorSimplifyLight(factorArray) {
+function bu2_simplify_factorSimplify(factorArray) {
+	bu2_debug_groupC("bu2_simplify_factorSimplify");
+
 	let constant = 1;
 	let variables = [];
 	let opArrays = [];
 
 	factorArray.map((factor) => {
-		if (factor instanceof bu2_MathematicalConstant) {
+		if (factor instanceof bu2_MathematicalConstant) { //-------------------------------constant
 			constant *= factor.val;
 		} else if (factor instanceof bu2_MathematicalVariable) { //-------------------------variable
 			let matchFound = false;
 			for (i = 0; i < variables.length && !matchFound; i++) {//loop through the variables that are already processed
 				if (variables[i].index === factor.index) { //if they are the same variable
-					variables[i].exponent += factor.exponent;
+					//add the exponents
+					variables[i].exponent = bu2_simplify_add(variables[i].exponent, factor.exponent);
 					matchFound = true;
 				}
 			}
@@ -414,8 +456,10 @@ function bu2_simplify_factorSimplifyLight(factorArray) {
 			bu2_simplify_sort(factor);
 			let matchFound = false;
 			for (i = 0; i < opArrays.length && !matchFound; i++) {//loop through the oparrays that are already processed
-				if (bu2_compareOperationArrayNoExponentNoSort(opArrays[i], factor)) { //if they have the same contents
-					opArrays[i].exponent += factor.exponent;
+				//check if they have the same contents
+				if (bu2_compareOperationArray(opArrays[i], factor)) {
+					//add the exponents
+					opArrays[i].exponent = bu2_simplify_add(opArrays[i].exponent, factor.exponent);
 					matchFound = true;
 				}
 			}
@@ -427,6 +471,8 @@ function bu2_simplify_factorSimplifyLight(factorArray) {
 	factorArray.splice(0, factorArray.length, constant, ...variables, ...opArrays);
 	if (factorArray.length == 1) factorArray = factorArray[0];
 
+	bu2_debug_groupEnd()
+	bu2_debug_log()
 	return factorArray;
 }
 
@@ -436,17 +482,23 @@ function bu2_simplify_factorSimplifyLight(factorArray) {
 using the 'Array.prototype.sort' method (recurs 'bu2_simplify_sort' on operation arrays before using 'Array.prototype.sort').
 */
 function bu2_simplify_sort(opArray) { //sorts
+	bu2_debug_groupC("bu2_simplify_sort")
+
 	let constants = [];
 	let variables = [];
-	let operationArrays = [];
+	let subOpArrays = [];
 	opArray.forEach(e => {
 		if (e instanceof bu2_MathematicalConstant) constants.push(e);
 		else if (e instanceof bu2_MathematicalVariable) variables.push(e);
-		else if (e instanceof bu2_OperationArray) operationArrays.push(e);
+		else if (e instanceof bu2_OperationArray) subOpArrays.push(e);
 		else console.error("The following element was not recognized:", e);
 	});
-	operationArrays = operationArrays.map(e => bu2_simplify_sort(e));
-	opArray.splice(0, opArray.length, ...constants.sort(), ...variables.sort(), ...operationArrays.sort());
+	subOpArrays = subOpArrays.map(e => bu2_simplify_sort(e));
+	opArray.splice(0, opArray.length, ...constants.sort(), ...variables.sort(), ...subOpArrays.sort());
+	opArray.sorted = true;
+
+	bu2_debug_groupEnd();
+	bu2_debug_log("bu2_simplify_sort", "OUT", opArray.slice());
 	return opArray;
 }
 
@@ -464,7 +516,7 @@ function bu2_classifyElement(value) {
 	else return "idek";
 }
 
-function bu2_compareOperationArrayNoExponentNoSort(opArray1, opArray2) {
+function bu2_compareOperationArray(opArray1, opArray2) {
 	let str1 = opArray1.map(e => JSON.stringify(e));
 	let str2 = opArray2.map(e => JSON.stringify(e));
 	
