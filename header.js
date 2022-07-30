@@ -344,6 +344,10 @@ class bu2_TermArray extends bu2_OperationArray {
 			arg1.map((e, i) => this[i] = e);
 		} else super(arg1); //acception handling for other input
 	} //constructor
+
+	toUserOutput() {
+		
+	}
 }
 
 
@@ -369,6 +373,10 @@ class bu2_FactorArray extends bu2_OperationArray {
 	getCoefficients() {
 		if (!sorted) bu2_simplify_sort(this);
 		return this.slice(1);
+	}
+
+	toUserOutput() {
+
 	}
 }
 
@@ -414,13 +422,25 @@ function bu2_simplify_add(...terms) {
 	}
 }
 
+/* -----------------------------------------------------------------------------------------------------------------------break down term
+*IN: Factor array (sorted) or variable
+*DESC: If input is factor array, will break constant appart from coefficients. If is variable, will add 1 and variable as coefficient
+*/
+function bu2_simplify_breakDownTerm(term) {
+	if (term instanceof bu2_MathematicalVariable) {
+		return [1, term];
+	} else if (term instanceof bu2_FactorArray) {
+		return [a[0], a.slice(1)];
+	}
+}
+
 /* --------------------------------------------------------------------------------------------------------------termSimplify
 *IN: Any instance of a term array
-*DESC: Psuedo:
-	~
+
 */
 function bu2_simplify_termSimplify(termArray) {
-
+	let constant = 0
+	let otherTerms = []
 }
 
 /* ---------------------------------------------------------------------------------------------------------------factorSimplify
@@ -432,8 +452,8 @@ function bu2_simplify_termSimplify(termArray) {
 	*If it is an operation array then it will sort it, and then check for matches in the same manner as the variable.
 *BUGS: Cannot add exponents that are not of primary int value.
 */
-function bu2_simplify_factorSimplify(factorArray) {
-	bu2_debug_groupC("bu2_simplify_factorSimplify");
+function bu2_simplify_factorArraySimplify(factorArray) {
+	bu2_debug_groupC("bu2_simplify_factorArraySimplify");
 
 	let constant = 1;
 	let variables = [];
@@ -471,8 +491,8 @@ function bu2_simplify_factorSimplify(factorArray) {
 	factorArray.splice(0, factorArray.length, constant, ...variables, ...opArrays);
 	if (factorArray.length == 1) factorArray = factorArray[0];
 
-	bu2_debug_groupEnd()
-	bu2_debug_log()
+	bu2_debug_groupEnd();
+	bu2_debug_log("bu2_simplify_factorArraySimplify", "OUT", factorArray.slice());
 	return factorArray;
 }
 
@@ -501,6 +521,7 @@ function bu2_simplify_sort(opArray) { //sorts
 	bu2_debug_log("bu2_simplify_sort", "OUT", opArray.slice());
 	return opArray;
 }
+
 
 //==========================================================================================================
 //----------------------------------------------------------------------------------------------------general
