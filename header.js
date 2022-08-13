@@ -50,37 +50,6 @@ const bu2_const_operators = ['=', '<', '>', '+', '-', '*', '/', '^', '#'];
 
 
 
-
-
-//--------------------------------------------------------------------------------check parenthesis
-function bu2_toMachine_checkParenthesis(parenStacks, char) {
-	if (char === '(') {
-		parenStacks[0] += 1;
-	}
-	else if (char === '[') {
-		parenStacks[1] += 1;
-	}
-	else if (char === '{') {
-		parenStacks[2] += 1;
-	}
-	
-	//check for closing parens
-	else if (char === ')') {
-		parenStacks[0] -= 1;
-	}
-	else if (char === ']') {
-		parenStacks[1] -= 1;
-	}
-	else if (char === '}') {
-		parenStacks[2] -= 1;
-	}
-	return parenStacks
-}
-
-
-
-
-
 //--------------------------------------------------------------------------------------slice at expressions
 function bu2_toMachine_sliceAtExpressions(string) { 
 	let expressionArray = []; //an array for the spliced terms
@@ -114,66 +83,98 @@ function bu2_toMachine_sliceAtExpressions(string) {
 
 
 
-//-----------------------------------------------------------------------------------------------slice at terms
-function bu2_toMachine_sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
-	let termArray = []; //an array for the spliced terms
-	let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
-	
-	let termBuild = ""; //create a string for concatinating chars to 
-	for (i=0; i<string.length; i++) { //start slice loop
-		if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no open parenthesis
-			if (string[i] === '+') { //if the character is a '+'
-				//push the term and empty the builder
-				termArray.push(termBuild);
-				termBuild = "";
-			} else if (string[i] === '-') { //if the character is a '-'
-				//push the term and empty the builder
-				termArray.push(termBuild);
-				termBuild = "-"; //add negative
-			} else { //if the character is neither
-				termBuild += string[i]; //keep building the term
-			}
-		} //end paren check
-		
-		else { //if the parens arn't closed
-			termBuild += string[i]; //keep building the term
-		}
-		
-		parenStacks = bu2_toMachine_checkParenthesis(parenStacks, string[i]); //keep paren stack up to date
-	} //end splice loop
-	termArray.push(termBuild);
-	
-	//bu2_debug_log("sliceAtTerms", "out", termArray.slice());
-	return termArray;
-} //end sliceAtTerms
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //==========================================================================================================
 //--------------------------------------------------------------------------------------------convert to machine
 //==========================================================================================================
-
-class bu2_TermArray extends Array {
-
+//--------------------------------------------------------------------------------check parenthesis
+function bu2_toMachine_checkParenthesis(parenStacks, char) {
+	if (char === '(') {
+		parenStacks[0] += 1;
+	}
+	else if (char === '[') {
+		parenStacks[1] += 1;
+	}
+	else if (char === '{') {
+		parenStacks[2] += 1;
+	}
 	
-	//---------------------------------------------------------------------------------------slice at factors
-	#sliceAtFactors(string) { //splice the term into it's factors
+	//check for closing parens
+	else if (char === ')') {
+		parenStacks[0] -= 1;
+	}
+	else if (char === ']') {
+		parenStacks[1] -= 1;
+	}
+	else if (char === '}') {
+		parenStacks[2] -= 1;
+	}
+	return parenStacks
+}
+
+//-------------------------------------------------------------------------------identify string
+function bu2_toMachine_interpretMathString(mathString) {
+	let type = {
+		influence: "nul",
+		type: "err"
+	}
+	if (mathString[0] === "/") {
+		type.influence = "div";
+	}
+	if (!isNaN(mathString)) {
+		type.type = "num";
+	} else if (bu2_const_variables.includes(mathString)) {
+		type.type = "var";
+	} else if (bu2_const_parenthesis.includes(mathString[0]) && bu2_const_parenthesis(mathString[mathString.length-1])) {
+		type.type = "exp";
+	} else {
+		type.type = "nxt";
+	}
+	return type
+}
+
+//------------------------------------------------------------------------------coefficient
+class bu2_Coefficient {
+	#sliceAtExponents(string) {
+		let parenStacks = [0, 0, 0]; //create stacks for [bu2_const_parenthesis '()', bracket '[]', brace '{}']
+		
+		let exponents = [];
+		let exponentBuild = "";
+		for (i=0; i<string.length; i++) {
+			if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no openbu2_const_parenthesis
+				if (string[i] === '^') {
+					exponents.push(exponentBuild);
+					exponentBuild = "";
+				} else if (string[i] === '/') { //if theres a little divide action
+					return ["(" + string.slice(1) + ")", -1]
+				} else {
+					exponentBuild += string[i];
+				}
+			} else { //if there is still an open parenthesis set
+				exponentBuild += string[i];
+			}
+			
+			parenStacks = bu2_toMachine_checkParenthesis(parenStacks, string[i]); //keep paren stack up to date
+		} //loop
+		exponents.push(exponentBuild);
+		
+		//bu2_debug_log("sliceAtExponents", "out", exponents.slice());
+		return exponents;
+	} //sliceAtExponents
+
+	constructor (mathString) {
+
+	}
+}
+
+
+//--------------------------------------------------------------------------------term
+class bu2_Term {
+	sliceAtFactors(string) { //splice the term into it's factors
 		let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
 
 		let factors = []; //array for factors
 		let factorBuild = ""; //builder for factors
-		for (i=0; i<string.length; i++) { //loop through term string
+		for (let i=0; i<string.length; i++) { //loop through term string
 			if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no open parenthesis
 				if ( //if implied multiplication with parenthesis
 					bu2_const_parenthesis.includes(string[i]) && //the current character is parenthesis
@@ -221,64 +222,77 @@ class bu2_TermArray extends Array {
 		return factors;
 	}//sliceAtFactors
 
+	constructor(mathString) {
+		let slices = this.sliceAtFactors(mathString);
+		this.constant = 1
+		this.coefficients = []
 
-	
-	//------------------------------------------------------------------slice at exponents
-	#sliceAtExponents(string) {
-		let parenStacks = [0, 0, 0]; //create stacks for [bu2_const_parenthesis '()', bracket '[]', brace '{}']
-		
-		let exponents = [];
-		let exponentBuild = "";
-		for (i=0; i<string.length; i++) {
-			if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no openbu2_const_parenthesis
-				if (string[i] === '^') {
-					exponents.push(exponentBuild);
-					exponentBuild = "";
-				} else if (string[i] === '/') { //if theres a little divide action
-					return ["(" + string.slice(1) + ")", -1]
-				} else {
-					exponentBuild += string[i];
+		for (i=0; i<slices.length; i++) { //for all the factors of the term:
+			let factor = slices[i];
+			let factorType = bu2_toMachine_interpretMathString(factor);
+			if (factorType.influence === "div") { //remove the divide sign if division
+				factor = factor.slice(1)
+			}
+
+			if (factorType.type === "num") {
+				if (factorType.influence === "div") { //if the number is divided: set to reciprocal
+					constant *= Math.pow(parseFloat(factor), -1);
+				} else { //the number is just as is
+					constant *= parseFloat(factor);
 				}
-			} else { //if there is still an open parenthesis set
-				exponentBuild += string[i];
+			} else if (factorType.type === "var") {
+				this.coefficients.push(new bu2_Coefficient(factor))
+			} else if (factorType.type === "exp") {
+				this.coefficients.push(new bu2_Expression(factor.slice(1, factor.length-1)))
+			}
+		}
+	}
+}
+
+class bu2_Expression extends Array {
+	#sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
+		let termArray = []; //an array for the spliced terms
+		let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
+		
+		let termBuild = ""; //create a string for concatinating chars to 
+		for (i=0; i<string.length; i++) { //start slice loop
+			if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no open parenthesis
+				if (string[i] === '+') { //if the character is a '+'
+					//push the term and empty the builder
+					termArray.push(termBuild);
+					termBuild = "";
+				} else if (string[i] === '-') { //if the character is a '-'
+					//push the term and empty the builder
+					termArray.push(termBuild);
+					termBuild = "-"; //add negative
+				} else { //if the character is neither
+					termBuild += string[i]; //keep building the term
+				}
+			} //end paren check
+			
+			else { //if the parens arn't closed
+				termBuild += string[i]; //keep building the term
 			}
 			
 			parenStacks = bu2_toMachine_checkParenthesis(parenStacks, string[i]); //keep paren stack up to date
-		} //loop
-		exponents.push(exponentBuild);
+		} //end splice loop
+		termArray.push(termBuild);
 		
-		//bu2_debug_log("sliceAtExponents", "out", exponents.slice());
-		return exponents;
-	} //sliceAtExponents
-
-	#handleSlice() {
-
-	}
+		//bu2_debug_log("sliceAtTerms", "out", termArray.slice());
+		return termArray;
+	} //end sliceAtTerms
 
 	constructor (string) {
-		let slices = bu2_toMachine_sliceAtTerms(string)
+		let slices = this.#sliceAtTerms(string)
+
 		for (i=0; i<slices.length; i++) {
-			this.#handleSlice(slices[i])
+			
 		}
 	}
 }
 
 
 
-
-
-
-
-//==========================================================================================================
-//-----------------------------------------------------------------------------------------------simplification
-//==========================================================================================================
-
-
-
-
-//==========================================================================================================
-//----------------------------------------------------------------------------------------------------general
-//==========================================================================================================
 
 
 //==========================================================================================================

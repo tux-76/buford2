@@ -21,12 +21,6 @@ Buford2.simplifyExpression = function (expression) {
 
 
 
-
-var a = new bu2_TermArray("2a+a+5ax")
-
-
-
-
 console.log("Buford2 app sucessfully loaded");
 
 /*
