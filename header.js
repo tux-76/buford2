@@ -9,8 +9,14 @@
 
 var bu2_debug_doDebug = true;
 
-function bu2_debug_log(funcName, descriptor, message) {
-	if (bu2_debug_doDebug) console.log("%cDEBUG|%c|" + funcName + "|%c|" + descriptor + ":", "color: #ff0000", "color:#079127", "color:#2c9c90", message);
+class Buford2Error extends Error {
+	constructor(message) {
+		super(message);
+	}
+}
+
+function bu2_debug_log(funcName, descriptor, ...messages) {
+	if (bu2_debug_doDebug) console.log("%cDEBUG|%c|" + funcName + "|%c|" + descriptor + ":", "color: #ff0000", "color:#079127", "color:#2c9c90", ...messages);
 }
 
 function bu2_debug_group(funcName) {
@@ -47,40 +53,7 @@ const bu2_const_variables = ['a','b','c','d','e','f','g','h','i','j','k','l','m'
 const bu2_const_numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-'];
 const bu2_const_parenthesis = ['(', '[', '{', ')', ']', '}'];
 const bu2_const_operators = ['=', '<', '>', '+', '-', '*', '/', '^', '#'];
-
-
-
-//--------------------------------------------------------------------------------------slice at expressions
-function bu2_toMachine_sliceAtExpressions(string) { 
-	let expressionArray = []; //an array for the spliced terms
-	let operations = [];
-	
-	let expressionBuild = ""; //create a string for concatinating chars to 
-	for (i=0; i<string.length; i++) { //start slice loop
-		if (string[i] === '=') { //if the character is a '='
-			expressionArray.push(expressionBuild);
-			expressionBuild = "";
-			operations.push(string[i]);
-		} else if (string[i] === '<') { //if the character is a '<'
-			expressionArray.push(expressionBuild);
-			expressionBuild = "";
-			operations.push(string[i]);
-		} else if (string[i] === '>') { //if the character is a '>'
-			expressionArray.push(expressionBuild);
-			expressionBuild = "";
-			operations.push(string[i]);
-		} else { //if the character is neither
-			expressionBuild += string[i]; //keep building the term
-		}
-	} //slice loop
-	expressionArray.push(expressionBuild);
-	
-	//bu2_debug_log("sliceAtExpressions", "out", [expressionArray.slice(), operations.slice()]);
-	return [expressionArray, operations];
-}
-
-
-
+const bu2_operationSymbols = ['=', '<', '>'];
 
 
 //==========================================================================================================
@@ -119,57 +92,112 @@ function bu2_toMachine_interpretMathString(mathString) {
 	}
 	if (mathString[0] === "/") {
 		type.influence = "div";
+		mathString = mathString.slice(1);
 	}
-	if (!isNaN(mathString)) {
+	if (mathString === "") {
+		type.type = "emp";
+	} else if (!isNaN(mathString)) {
 		type.type = "num";
 	} else if (bu2_const_variables.includes(mathString)) {
 		type.type = "var";
-	} else if (bu2_const_parenthesis.includes(mathString[0]) && bu2_const_parenthesis(mathString[mathString.length-1])) {
+	} else if (bu2_const_parenthesis.includes(mathString[0]) && bu2_const_parenthesis.includes(mathString[mathString.length-1])) {
 		type.type = "exp";
 	} else {
-		type.type = "nxt";
+		type.type = "non";
 	}
 	return type
 }
 
-//------------------------------------------------------------------------------coefficient
-class bu2_Coefficient {
-	#sliceAtExponents(string) {
-		let parenStacks = [0, 0, 0]; //create stacks for [bu2_const_parenthesis '()', bracket '[]', brace '{}']
-		
-		let exponents = [];
-		let exponentBuild = "";
-		for (i=0; i<string.length; i++) {
-			if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no openbu2_const_parenthesis
-				if (string[i] === '^') {
-					exponents.push(exponentBuild);
-					exponentBuild = "";
-				} else if (string[i] === '/') { //if theres a little divide action
-					return ["(" + string.slice(1) + ")", -1]
-				} else {
-					exponentBuild += string[i];
-				}
-			} else { //if there is still an open parenthesis set
-				exponentBuild += string[i];
-			}
-			
-			parenStacks = bu2_toMachine_checkParenthesis(parenStacks, string[i]); //keep paren stack up to date
-		} //loop
-		exponents.push(exponentBuild);
-		
-		//bu2_debug_log("sliceAtExponents", "out", exponents.slice());
-		return exponents;
-	} //sliceAtExponents
+//==========================================================================================================
+//------------------------------------------------------------------------------------------------------classes
+//==========================================================================================================
 
-	constructor (mathString) {
-
+//------------------------------------------------------------------------------variable
+class bu2_Variable {
+	constructor (char) {
+		this.index = bu2_const_variables.indexOf(char);
+		if (this.index === -1) console.error(`Character "${char}" is not a valid variable.`);
+	}
+	get char() {
+		return bu2_const_variables[this.index];
 	}
 }
 
+//------------------------------------------------------------------------------coefficient
+class bu2_Coefficient {
+	#sliceAtExponent(string) {
+		let base = ""
+		let exponent = ""
+		let parenStacks = [0, 0, 0]
+
+		let i = 0;
+		while (!(string[i] == "^" && (parenStacks[0] == 0 && parenStacks[1] == 0 && parenStacks[2] == 0)) && i < string.length) { // loop to ^ sign
+			base += string[i]
+			parenStacks = bu2_toMachine_checkParenthesis(parenStacks, string[i])
+			i++;
+		}
+		i++;
+		while(i < string.length) { // set exponent to everything after ^ sign
+			exponent += string[i];
+			i++;
+		}
+
+		return [base, exponent];
+	} //sliceAtExponents
+
+	base = null;
+	exponent = null;
+
+	constructor (coefStr) {
+		bu2_debug_groupC(`Coefficient constructor: ${coefStr}`);
+
+		//slice input to base and exponent
+		let sliced = this.#sliceAtExponent(coefStr);
+		let baseStr = sliced[0];
+		let exponentStr = sliced[1];
+		
+		//handle exponent str
+		let exponentType = bu2_toMachine_interpretMathString(exponentStr);
+		if (exponentType.type === "num") this.exponent = parseFloat(exponentStr);
+		else if (exponentType.type === "emp") this.exponent = 1;
+		//else this.exponent = new bu2_Expression(exponentStr);
+		else console.error(`Input error for string "${exponentStr}": only numerical values are allowed for exponents at this moment :(`);
+
+		//handle base str division
+		let baseType = bu2_toMachine_interpretMathString(baseStr);
+		if (baseType.influence === "div") { //if division
+			baseStr = baseStr.slice(1) //remove sign
+			if (!isNaN(this.exponent)) { //if exponent is number
+				this.exponent *= -1; //invert
+			} else { //if not number
+
+			}
+		}
+
+		//handle base str
+		if (baseType.type === "num") {
+			this.base = parseFloat(baseStr)
+		} else if (baseType.type === "var") {
+			this.base = new bu2_Variable(baseStr);
+		} else if (baseType.type === "exp") {
+			this.base = new bu2_Expression(baseStr.slice(1, baseStr.length-1));
+		} else console.error(`Coefficient base type "${baseType.type}" does not have a handler.`);
+		bu2_debug_log("Coefficient constructor", "base", this.base);
+		bu2_debug_log("Coefficient constructor", "exponent", this.exponent);
+		bu2_debug_groupEnd();
+	}
+
+	isNumerical() {return (!isNaN(this.base) && !isNaN(this.exponent))}; //determines if coefficient has objects or variables
+
+	simplify() {
+		if (!isNaN(this.base)) this.base.simplify();
+		if (!isNaN(this.exponent)) this.exponent.simplify();
+	}
+}
 
 //--------------------------------------------------------------------------------term
 class bu2_Term {
-	sliceAtFactors(string) { //splice the term into it's factors
+	#sliceAtFactors(string) { //splice the term into it's factors
 		let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
 
 		let factors = []; //array for factors
@@ -222,48 +250,79 @@ class bu2_Term {
 		return factors;
 	}//sliceAtFactors
 
-	constructor(mathString) {
-		let slices = this.sliceAtFactors(mathString);
-		this.constant = 1
-		this.coefficients = []
+	constant = 1;
+	coefficients = [];
 
-		for (i=0; i<slices.length; i++) { //for all the factors of the term:
-			let factor = slices[i];
+	constructor(mathString) {
+		bu2_debug_groupC(`Term constructor: ${mathString}`);
+
+		//main
+		let slices = this.#sliceAtFactors(mathString);
+		slices.forEach(factor => { //for all the factors of the term:
 			let factorType = bu2_toMachine_interpretMathString(factor);
-			if (factorType.influence === "div") { //remove the divide sign if division
-				factor = factor.slice(1)
-			}
 
 			if (factorType.type === "num") {
 				if (factorType.influence === "div") { //if the number is divided: set to reciprocal
-					constant *= Math.pow(parseFloat(factor), -1);
+					this.constant *= Math.pow(parseFloat(factor.slice(1)), -1); // constant * factor(without '/') ^ -1
 				} else { //the number is just as is
-					constant *= parseFloat(factor);
+					this.constant *= parseFloat(factor);
 				}
-			} else if (factorType.type === "var") {
-				this.coefficients.push(new bu2_Coefficient(factor))
-			} else if (factorType.type === "exp") {
-				this.coefficients.push(new bu2_Expression(factor.slice(1, factor.length-1)))
+			} else {
+				this.coefficients.push(new bu2_Coefficient(factor));
 			}
-		}
+		});
+
+		bu2_debug_log("Term Constructor", "constant", this.constant);
+		bu2_debug_log("Term Constructor", "coefficients", this.coefficients);
+		bu2_debug_groupEnd();
+	}
+
+
+
+	//-----------------------------------------simplify
+	simplify() {
+		let coefs = this.coefficients.filter(coef => {
+			coef.simplify();
+			if (coef.isNumerical()) {
+				this.constant *= Math.pow(coef.base, coef.exponent);
+				return false;
+			} else return true;
+		});
+
+		let simplified = [];
+		coefs.filter((coef, ci) => {
+			console.log("coef", ci, coef.base);
+			let matchFound = false;
+			for (let sci = 0; sci < simplified.length && !matchFound; sci++) {
+				let simpCoef = simplified[sci];
+				console.log("\tsimp coef", sci, simpCoef.base);
+				if (bu2_toString(coef.base) == bu2_toString(simpCoef.base)) {
+					simpCoef.exponent += coef.exponent;
+					matchFound = true;
+				}
+			}
+			if (!matchFound) simplified.push(coef);
+		});
+		this.coefficients = simplified;
 	}
 }
 
+//--------------------------------------------------------------------------------expression
 class bu2_Expression extends Array {
 	#sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
-		let termArray = []; //an array for the spliced terms
+		let slicedTerms = []; //an array for the spliced terms
 		let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
 		
 		let termBuild = ""; //create a string for concatinating chars to 
-		for (i=0; i<string.length; i++) { //start slice loop
+		for (let i = 0; i<string.length; i++) { //start slice loop
 			if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no open parenthesis
 				if (string[i] === '+') { //if the character is a '+'
 					//push the term and empty the builder
-					termArray.push(termBuild);
+					slicedTerms.push(termBuild);
 					termBuild = "";
 				} else if (string[i] === '-') { //if the character is a '-'
 					//push the term and empty the builder
-					termArray.push(termBuild);
+					if (termBuild !== "") slicedTerms.push(termBuild);
 					termBuild = "-"; //add negative
 				} else { //if the character is neither
 					termBuild += string[i]; //keep building the term
@@ -276,23 +335,216 @@ class bu2_Expression extends Array {
 			
 			parenStacks = bu2_toMachine_checkParenthesis(parenStacks, string[i]); //keep paren stack up to date
 		} //end splice loop
-		termArray.push(termBuild);
+		slicedTerms.push(termBuild);
 		
 		//bu2_debug_log("sliceAtTerms", "out", termArray.slice());
-		return termArray;
+		return slicedTerms;
 	} //end sliceAtTerms
 
+	//----------------------------------------------------constructor
 	constructor (string) {
-		let slices = this.#sliceAtTerms(string)
+		bu2_debug_groupC(`Expression constructor: ${string}`);
 
-		for (i=0; i<slices.length; i++) {
-			
+		super(0);
+		let slices = this.#sliceAtTerms(string);
+
+		for (let i = 0; i<slices.length; i++) {
+			this[i] = new bu2_Term(slices[i]);
 		}
+
+		bu2_debug_groupEnd();
+	}
+
+	bufordSort() {
+		bu2_sortArrayObject(this);
+	}
+
+	//---------------------------------------------------simplify
+	simplify() {
+		let simplified = [];
+		this.forEach(term => {
+			let matchFound = false;
+			for (let i = 0; (i < simplified.length) && !matchFound; i++) {
+				let simpTerm = simplified[i];
+				if (bu2_compareTerms(term, simpTerm)) {
+					simpTerm.constant += term.constant;
+					matchFound = true;
+				}
+			}
+			if (!matchFound) simplified.push(term);
+		})
+		this.splice(0);
+		simplified.forEach(simpTerm => this.push(simpTerm));
+	}
+
+
+
+	//-----------------------------------------------------distribute
+	distribute(term) {
+
+	}
+}
+
+//---------------------------------------------------------------------------------two sided equation
+class bu2_Equation {
+	#sliceAtExpressions(string) { 
+		let expressionArray = []; //an array for the spliced terms
+		let operations = [];
+		
+		let expressionBuild = ""; //create a string for concatinating chars to 
+		for (let i=0; i<string.length; i++) { //start slice loop
+			if (string[i] === '=') { //if the character is a '='
+				expressionArray.push(expressionBuild);
+				expressionBuild = "";
+				operations.push(string[i]);
+			} else if (string[i] === '<') { //if the character is a '<'
+				expressionArray.push(expressionBuild);
+				expressionBuild = "";
+				operations.push(string[i]);
+			} else if (string[i] === '>') { //if the character is a '>'
+				expressionArray.push(expressionBuild);
+				expressionBuild = "";
+				operations.push(string[i]);
+			} else { //if the character is neither
+				expressionBuild += string[i]; //keep building the term
+			}
+		} //slice loop
+		expressionArray.push(expressionBuild);
+		
+		//bu2_debug_log("sliceAtExpressions", "out", [expressionArray.slice(), operations.slice()]);
+		return [expressionArray, operations];
+	}
+
+	operation = null;
+	left = null;
+	right = null;
+
+	constructor(mathString) {
+		bu2_debug_groupC(`Equation constructor: ${mathString}`);
+
+		let sliced = this.#sliceAtExpressions(mathString);
+		if (sliced[0].length > 2) throw new Buford2Error("bu2_TwoSidedEquation cannot have more than 2 expressions!");
+
+		this.left = new bu2_Expression(sliced[0][0]);
+		this.right = new bu2_Expression(sliced[0][1]);
+		this.operation = bu2_operationSymbols.indexOf(sliced[1][0]);
+
+		bu2_debug_groupEnd();
+	}
+
+
+	//------------------------------------------------------swap sides
+	swap() {
+		let oldRight = this.right.slice();
+		this.right = this.left.slice();
+		this.left = oldRight;
+	}
+
+	//------------------------------------------------------move terms
+	moveTerms(termSide, ...termIndexes) {
+		let reciever = (termSide === 1) ? 0 : 1;
+		
+		termIndexes.forEach((index) => {
+			let term = this[termSide][index];
+
+			term.constant *= -1;
+			this[reciever].push(term);
+		});
+
+		//remove moved elements from original place
+		this[termSide] = this[termSide].filter((e, i) => !termIndexes.includes(i));
+
+		bu2_debug_log("bu2_TwoSidedEquation", "moveTerms", "terms", ...termIndexes, "move to side", termSide);
 	}
 }
 
 
 
+//===============================================================================================================
+//--------------------------------------------------------------------------------------------------------------sort
+//===============================================================================================================
+/*----------------------------------------------------------to string
+	MODES: "normal", "no constant", "no parenthesis"
+*/
+function bu2_toString(value, mode="normal") {
+	if (!isNaN(value)) return value.toString();
+
+	else if (value instanceof bu2_Variable) return value.char;
+
+	else if (value instanceof bu2_Coefficient) return bu2_toString(value.base) + ((value.exponent !== 1) ? ("^" + bu2_toString(value.exponent)) : "");
+
+	else if (value instanceof bu2_Term) {
+		let string = ((value.constant !== 1 || value.coefficients.length < 1) && !(mode === "no constant")) ? bu2_toString(value.constant) : ""; //add constant num if not 1 and more coefficients
+		value.coefficients.forEach((coef) => {
+			if (!isNaN(coef.base) && string.length > 0) string += "*";
+			string += bu2_toString(coef);
+		});
+		return string;
+	}
+	else if (value instanceof bu2_Expression) {
+		let string = ""
+		if (!(mode === "no parenthesis")) {
+			value.forEach((e) => string += bu2_toString(e) + "+"); 
+			string = string.substring(0, string.length-1/*remove the + at the end*/);
+			return `(${string})`;
+		} else {
+			value.forEach((e) => string += bu2_toString(e) + " + "); 
+			string = string.substring(0, string.length-3/*remove the + at the end*/);
+			return string;
+		}
+	}
+	else if (value instanceof bu2_Equation) {
+		side1 = bu2_toString(value.left, "no parenthesis");
+		side2 = bu2_toString(value.right, "no parenthesis");
+		return side1 + ` ${bu2_operationSymbols[value.operation]} ` + side2;
+	}
+	else console.error(`bu2_toString did not recognize value:`, value);
+}
+
+//------------------------------------------------------------sort
+function bu2_sort(object) {
+	if (object instanceof bu2_Variable || !isNaN(object)) return "number" //do not do anything to variables or numbers
+	else if (object instanceof bu2_Coefficient) {
+		bu2_sort(object.base);
+		bu2_sort(object.exponent);
+	}
+	else if (object instanceof bu2_Term) bu2_sortArrayObject(object.coefficients);
+	else if (object instanceof bu2_Expression) bu2_sortArrayObject(object);
+	else if (object instanceof bu2_Equation) {
+		bu2_sortArrayObject(object.left);
+		bu2_sortArrayObject(object.right);
+	}
+	else console.error("bu2_sort could not handle value:", object);
+}
+
+//----------------------------------------------------------sort array object
+function bu2_sortArrayObject(array) { //sorts array objects (term's coefficents property, expression itself)
+	array.forEach(e => bu2_sort(e)); //sort all values within this object
+	
+	//create string array with values corresponding to the real ones
+	let correspondingStrArr = [...array.map(e => bu2_toString(e))];
+
+	//create and organize sortedStrArr
+	let sortedStrArr = correspondingStrArr.slice().sort();
+	sortedStrArr.slice().forEach((e, i) => {
+		if (bu2_const_parenthesis.includes(e[0])) { //if the first character is a parenthesis
+			sortedStrArr.splice(i, 1); //remove the element
+			sortedStrArr.push(e); //put it at the end
+		}
+	})
+
+	//create sorted array with the actual values
+	let sortedArray = sortedStrArr.map((string) => array[correspondingStrArr.indexOf(string)]);
+	sortedArray.forEach((str, i) => array[i] = str); //set this object's values to the sorted array
+}
+
+
+//===============================================================================================================
+//----------------------------------------------------------------------------------------------------------simplify
+//===============================================================================================================
+function bu2_compareTerms(term1, term2) {
+	return (bu2_toString(term1, "no constant") == bu2_toString(term2, "no constant"));
+}
 
 
 //==========================================================================================================
