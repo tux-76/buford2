@@ -1,15 +1,8 @@
 
 /*
-	Buford 2 is a mathematics bot with the purpose of handling problems that are in a non computer-friendly form.
+	Buford 2 is a mathematics bot with the purpose of handling problems that are in string form.
 */
 
-
-
-
-
-//-----------------------------------------------------------------------------------------------------------
-//====================== main i guess =======================================================================
-//-----------------------------------------------------------------------------------------------------------
 
 function Buford2 () {
 	
@@ -31,6 +24,7 @@ Timeline:
 		-SAT 15:38 4/30/2022: Multidimensional array system working??? [Machine readable matrix]
 		-MON 20:57 5/9/2022: Just started using VS code after moving to Pop!_OS. It turns out to be a whole lot better than the default text editor I was using previously :)
 		-SAT 17:10 5/14/2022: About to change the way the machine readable part works :/ I don't want to have exponents as operation arrays anymore. It seemed to make since in theory but did not work out practicaly.
+		-MON 20:08 9/12/2022: Changed the data structure once again. This time we have classes for Expression, Term, and Coefficient. This allows for more specialized methods involving each.
 */
 
 

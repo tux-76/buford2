@@ -190,8 +190,8 @@ class bu2_Coefficient {
 	isNumerical() {return (!isNaN(this.base) && !isNaN(this.exponent))}; //determines if coefficient has objects or variables
 
 	simplify() {
-		if (!isNaN(this.base)) this.base.simplify();
-		if (!isNaN(this.exponent)) this.exponent.simplify();
+		if (isNaN(this.base) && !(this.base instanceof bu2_Variable)) this.base.simplify();
+		if (isNaN(this.exponent) && !(this.base instanceof bu2_Variable)) this.exponent.simplify();
 	}
 }
 
@@ -250,11 +250,12 @@ class bu2_Term {
 		return factors;
 	}//sliceAtFactors
 
+
+	//---------------------------------------------constructor
 	constant = 1;
 	coefficients = [];
-
-	constructor(mathString) {
-		bu2_debug_groupC(`Term constructor: ${mathString}`);
+	#stringConstuct(mathString) {
+		bu2_debug_groupC(`Term constructor (string): ${mathString}`);
 
 		//main
 		let slices = this.#sliceAtFactors(mathString);
@@ -276,13 +277,29 @@ class bu2_Term {
 		bu2_debug_log("Term Constructor", "coefficients", this.coefficients);
 		bu2_debug_groupEnd();
 	}
+	#manualConstruct(constant, coefficients=[]) {
+		this.constant = constant;
+		this.coefficients = coefficients;
+	}
+	constructor(arg1, arg2) {
+		if (typeof arg1 === "string") this.#stringConstuct(arg1);
+		else this.#manualConstruct(arg1, arg2);
+	}
 
+	//-----------------------------------------copy
+	copy() {
+		return new bu2_Term(this.constant, this.coefficients);
+	}
 
+	//-----------------------------------------multiply
+	multiply(term) {
+		this.constant *= term.constant;
+		this.coefficients = this.coefficients.concat(term.coefficients);
+	}
 
 	//-----------------------------------------simplify
 	simplify() {
 		let coefs = this.coefficients.filter(coef => {
-			coef.simplify();
 			if (coef.isNumerical()) {
 				this.constant *= Math.pow(coef.base, coef.exponent);
 				return false;
@@ -291,11 +308,9 @@ class bu2_Term {
 
 		let simplified = [];
 		coefs.filter((coef, ci) => {
-			console.log("coef", ci, coef.base);
 			let matchFound = false;
 			for (let sci = 0; sci < simplified.length && !matchFound; sci++) {
 				let simpCoef = simplified[sci];
-				console.log("\tsimp coef", sci, simpCoef.base);
 				if (bu2_toString(coef.base) == bu2_toString(simpCoef.base)) {
 					simpCoef.exponent += coef.exponent;
 					matchFound = true;
@@ -304,6 +319,15 @@ class bu2_Term {
 			if (!matchFound) simplified.push(coef);
 		});
 		this.coefficients = simplified;
+	}
+
+	//---------------------------------------is distributable
+	get isDistributable() {
+		let flag = false;
+		this.coefficients.forEach(coef => {
+			if (coef.base instanceof bu2_Expression) flag = true;
+		});
+		return flag;
 	}
 }
 
@@ -343,18 +367,21 @@ class bu2_Expression extends Array {
 
 	//----------------------------------------------------constructor
 	constructor (string) {
-		bu2_debug_groupC(`Expression constructor: ${string}`);
+		if (typeof string === "string") { 
+			bu2_debug_groupC(`Expression constructor: ${string}`);
 
-		super(0);
-		let slices = this.#sliceAtTerms(string);
+			super(0);
+			let slices = this.#sliceAtTerms(string);
 
-		for (let i = 0; i<slices.length; i++) {
-			this[i] = new bu2_Term(slices[i]);
-		}
+			for (let i = 0; i<slices.length; i++) {
+				this[i] = new bu2_Term(slices[i]);
+			}
 
-		bu2_debug_groupEnd();
+			bu2_debug_groupEnd();
+		} else super(string);
 	}
 
+	//---------------------------------------------------buford sort
 	bufordSort() {
 		bu2_sortArrayObject(this);
 	}
@@ -377,11 +404,23 @@ class bu2_Expression extends Array {
 		simplified.forEach(simpTerm => this.push(simpTerm));
 	}
 
-
-
 	//-----------------------------------------------------distribute
-	distribute(term) {
-
+	distribute(termIndex, recursive=false) {
+		let term = this[termIndex]; this.splice(termIndex, 1);
+		let expressionIndex = null;
+		for (let i = 0; i < term.coefficients.length && expressionIndex === null; i++) {
+			if (term.coefficients[i].base instanceof bu2_Expression) expressionIndex = i;
+			console.log(term.coefficients[i].base)
+		}
+		console.log("expr", expressionIndex, term)
+		let expression = term.coefficients[expressionIndex].base; term.coefficients.splice(expressionIndex, 1);
+		let newTerms = [];
+		expression.forEach((distributingTerm) => {
+			let newTerm = term.copy();
+			newTerm.multiply(distributingTerm);
+			newTerms.push(newTerm);
+		});
+		newTerms.forEach(e => this.push(e));
 	}
 }
 
