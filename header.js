@@ -3,11 +3,12 @@
 	*Buford2 private functions
 */
 
+
 //==========================================================================================================
 //-------------------------------------------------------------------------------------------------------debug
 //==========================================================================================================
 
-var bu2_debug_doDebug = true;
+var bu2_doDebug = true;
 
 class Buford2Error extends Error {
 	constructor(message) {
@@ -15,35 +16,29 @@ class Buford2Error extends Error {
 	}
 }
 
-function bu2_debug_log(funcName, descriptor, ...messages) {
-	if (bu2_debug_doDebug) console.log("%cDEBUG|%c|" + funcName + "|%c|" + descriptor + ":", "color: #ff0000", "color:#079127", "color:#2c9c90", ...messages);
-}
+let titleColor = "color: #c63915";
+let arrowColorOut = "color: #1da588";
+let arrowColorIn = "color: #b144c9";
+let normalColor = "color: #878d94";
 
-function bu2_debug_group(funcName) {
-	if (bu2_debug_doDebug) console.group("%cDEBUG|%c|" + funcName, "color: #ff0000", "color:#2c9c90");
-}
-function bu2_debug_groupC(funcName) {
-	if (bu2_debug_doDebug) console.groupCollapsed("%cDEBUG|%c|" + funcName, "color: #ff0000", "color:#2c9c90");
-}
-function bu2_debug_groupEnd() {
-	if (bu2_debug_doDebug) console.groupEnd();
-}
-function bu2_debug_printMatrix(matrix) {
-	if (bu2_debug_doDebug) {
-		bu2_debug_groupC(matrix.type);
-		matrix.map((e, i) => {
-			if (Array.isArray(e))
-				bu2_debug_printMatrix(e);
-			else {
-				//bu2_debug_groupC(isNaN(e) ? ` ${e.character} (Variable)` : ` ${e} (Number)`); bu2_debug_groupEnd();
-				bu2_debug_log("PRINT", e.type === "MathematicalVariable" ? `Variable` : `Number`, e.type === "MathematicalVariable" ? e.character : e.val);
-			}
-		});
-		bu2_debug_groupEnd();
+function bu2_debug_log(title, output) {
+	if (bu2_doDebug) {
+		if (typeof output === "string") console.log(`%c${title} %c=> %c${output}`, titleColor, arrowColorOut, normalColor);
+
+		else console.log(`%c${title} %c=> %c${bu2_toString(output, "no parenthesis")}`, titleColor, arrowColorOut, normalColor);
 	}
 }
-
-
+function bu2_debug_group(title, input, collapsed=1) {
+	if (bu2_doDebug) {
+		let string = (typeof input === "string") ? input : bu2_toString(input, "no parenthesis");
+		if (collapsed) console.groupCollapsed(`%c${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
+		else console.group(`%c${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
+		
+	}
+}
+function bu2_debug_groupEnd() {
+	if (bu2_doDebug) console.groupEnd()
+}
 
 //==========================================================================================================
 //-----------------------------------------------------------------------------------------------string slicing
@@ -52,7 +47,7 @@ function bu2_debug_printMatrix(matrix) {
 const bu2_const_variables = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
 const bu2_const_numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-'];
 const bu2_const_parenthesis = ['(', '[', '{', ')', ']', '}'];
-const bu2_const_operators = ['=', '<', '>', '+', '-', '*', '/', '^', '#'];
+const bu2_const_operators = ['=', '<', '>', '+', '-', '*', '/', '^'];
 const bu2_operationSymbols = ['=', '<', '>'];
 
 
@@ -112,6 +107,8 @@ function bu2_toMachine_interpretMathString(mathString) {
 //------------------------------------------------------------------------------------------------------classes
 //==========================================================================================================
 
+
+
 //------------------------------------------------------------------------------variable
 class bu2_Variable {
 	constructor (char) {
@@ -122,6 +119,12 @@ class bu2_Variable {
 		return bu2_const_variables[this.index];
 	}
 }
+
+
+
+
+
+
 
 //------------------------------------------------------------------------------coefficient
 class bu2_Coefficient {
@@ -148,9 +151,8 @@ class bu2_Coefficient {
 	base = null;
 	exponent = null;
 
-	constructor (coefStr) {
-		bu2_debug_groupC(`Coefficient constructor: ${coefStr}`);
-
+	//---------------------------------------------------------------constructor
+	#stringConstuctor(coefStr) {
 		//slice input to base and exponent
 		let sliced = this.#sliceAtExponent(coefStr);
 		let baseStr = sliced[0];
@@ -182,18 +184,46 @@ class bu2_Coefficient {
 		} else if (baseType.type === "exp") {
 			this.base = new bu2_Expression(baseStr.slice(1, baseStr.length-1));
 		} else console.error(`Coefficient base type "${baseType.type}" does not have a handler.`);
-		bu2_debug_log("Coefficient constructor", "base", this.base);
-		bu2_debug_log("Coefficient constructor", "exponent", this.exponent);
-		bu2_debug_groupEnd();
+	}
+	#manualConstructor(base, exponent) {
+		this.base = base;
+		this.exponent = exponent;
+	}
+	constructor (arg1, arg2) {
+		if (typeof arg1 === "string") this.#stringConstuctor(arg1);
+		else this.#manualConstructor(arg1, arg2);
 	}
 
+	//---------------------------------------------------------------has variable
+	hasVariable(variable=-1) {
+		let hasVar = false;
+		if (this.base instanceof bu2_Variable) {
+			if (variable === -1 || this.base.index === variable) hasVar = true;
+		} else if (this.base instanceof bu2_Expression) {
+			if (this.base.hasVariable(variable)) hasVar = true;
+		}
+		if (this.exponent instanceof bu2_Variable) {
+			if (variable === -1 || this.exponent.index === variable) hasVar = true;
+		} else if (this.exponent instanceof bu2_Expression) {
+			if (this.exponent.hasVariable(variable)) hasVar = true;
+		}
+		return hasVar;
+	}
+
+	//---------------------------------------------------------------is numerical
 	isNumerical() {return (!isNaN(this.base) && !isNaN(this.exponent))}; //determines if coefficient has objects or variables
 
+	//----------------------------------------------------------------simplify
 	simplify() {
 		if (isNaN(this.base) && !(this.base instanceof bu2_Variable)) this.base.simplify();
 		if (isNaN(this.exponent) && !(this.base instanceof bu2_Variable)) this.exponent.simplify();
 	}
 }
+
+
+
+
+
 
 //--------------------------------------------------------------------------------term
 class bu2_Term {
@@ -246,7 +276,6 @@ class bu2_Term {
 			factors.push(factorBuild);
 		}
 		
-		//bu2_debug_log("sliceAtFactors", "out", factors.slice());
 		return factors;
 	}//sliceAtFactors
 
@@ -254,9 +283,7 @@ class bu2_Term {
 	//---------------------------------------------constructor
 	constant = 1;
 	coefficients = [];
-	#stringConstuct(mathString) {
-		bu2_debug_groupC(`Term constructor (string): ${mathString}`);
-
+	#stringConstuctor(mathString) {
 		//main
 		let slices = this.#sliceAtFactors(mathString);
 		slices.forEach(factor => { //for all the factors of the term:
@@ -272,34 +299,42 @@ class bu2_Term {
 				this.coefficients.push(new bu2_Coefficient(factor));
 			}
 		});
-
-		bu2_debug_log("Term Constructor", "constant", this.constant);
-		bu2_debug_log("Term Constructor", "coefficients", this.coefficients);
-		bu2_debug_groupEnd();
 	}
-	#manualConstruct(constant, coefficients=[]) {
+	#manualConstructor(constant, coefficients=[]) {
 		this.constant = constant;
 		this.coefficients = coefficients;
 	}
 	constructor(arg1, arg2) {
-		if (typeof arg1 === "string") this.#stringConstuct(arg1);
-		else this.#manualConstruct(arg1, arg2);
+		if (typeof arg1 === "string") this.#stringConstuctor(arg1);
+		else this.#manualConstructor(arg1, arg2);
+	}
+
+	//------------------------------------------has variable
+	hasVariable(variable=-1) {
+		let hasVar = false;
+		this.coefficients.forEach(coef => {
+			if (coef.hasVariable(variable)) hasVar = true;
+		});
+		return hasVar;
 	}
 
 	//-----------------------------------------copy
 	copy() {
-		return new bu2_Term(this.constant, this.coefficients);
+		return new bu2_Term(bu2_toString(this));
 	}
 
 	//-----------------------------------------multiply
 	multiply(term) {
 		this.constant *= term.constant;
-		this.coefficients = this.coefficients.concat(term.coefficients);
+		term.coefficients.forEach(coef => {
+			this.coefficients.push(new bu2_Coefficient(coef.base, coef.exponent));
+		});
 	}
 
 	//-----------------------------------------simplify
 	simplify() {
 		let coefs = this.coefficients.filter(coef => {
+			coef.simplify();
 			if (coef.isNumerical()) {
 				this.constant *= Math.pow(coef.base, coef.exponent);
 				return false;
@@ -311,7 +346,7 @@ class bu2_Term {
 			let matchFound = false;
 			for (let sci = 0; sci < simplified.length && !matchFound; sci++) {
 				let simpCoef = simplified[sci];
-				if (bu2_toString(coef.base) == bu2_toString(simpCoef.base)) {
+				if (bu2_toString(coef.base) === bu2_toString(simpCoef.base)) {
 					simpCoef.exponent += coef.exponent;
 					matchFound = true;
 				}
@@ -330,6 +365,11 @@ class bu2_Term {
 		return flag;
 	}
 }
+
+
+
+
+
 
 //--------------------------------------------------------------------------------expression
 class bu2_Expression extends Array {
@@ -361,24 +401,28 @@ class bu2_Expression extends Array {
 		} //end splice loop
 		slicedTerms.push(termBuild);
 		
-		//bu2_debug_log("sliceAtTerms", "out", termArray.slice());
 		return slicedTerms;
 	} //end sliceAtTerms
 
 	//----------------------------------------------------constructor
 	constructor (string) {
 		if (typeof string === "string") { 
-			bu2_debug_groupC(`Expression constructor: ${string}`);
-
 			super(0);
 			let slices = this.#sliceAtTerms(string);
 
 			for (let i = 0; i<slices.length; i++) {
 				this[i] = new bu2_Term(slices[i]);
 			}
-
-			bu2_debug_groupEnd();
 		} else super(string);
+	}
+
+	//--------------------------------------------------has variable
+	hasVariable(variable=-1) {
+		let hasVar = false;
+		this.forEach(term => {
+			if (term.hasVariable(variable)) hasVar = true;
+		});
+		return hasVar;
 	}
 
 	//---------------------------------------------------buford sort
@@ -388,6 +432,9 @@ class bu2_Expression extends Array {
 
 	//---------------------------------------------------simplify
 	simplify() {
+		this.forEach(term => {
+			term.simplify();
+		});
 		let simplified = [];
 		this.forEach(term => {
 			let matchFound = false;
@@ -406,14 +453,17 @@ class bu2_Expression extends Array {
 
 	//-----------------------------------------------------distribute
 	distribute(termIndex, recursive=false) {
+		if (!this[termIndex].isDistributable) return 1;
 		let term = this[termIndex]; this.splice(termIndex, 1);
+
+		//get the index of the expression within the term
 		let expressionIndex = null;
 		for (let i = 0; i < term.coefficients.length && expressionIndex === null; i++) {
 			if (term.coefficients[i].base instanceof bu2_Expression) expressionIndex = i;
-			console.log(term.coefficients[i].base)
 		}
-		console.log("expr", expressionIndex, term)
 		let expression = term.coefficients[expressionIndex].base; term.coefficients.splice(expressionIndex, 1);
+
+		//start distributing
 		let newTerms = [];
 		expression.forEach((distributingTerm) => {
 			let newTerm = term.copy();
@@ -421,8 +471,40 @@ class bu2_Expression extends Array {
 			newTerms.push(newTerm);
 		});
 		newTerms.forEach(e => this.push(e));
+
+		//recurse if set to
+		if (recursive) {
+			newTerms.forEach(newTerm => {
+				if (newTerm.isDistributable) this.distribute(this.indexOf(newTerm), true);
+			});
+		}
+
+		return 0;
+	}
+
+	//----------------------------------------------------flatten
+	compress() {
+		bu2_debug_group("Compress Expression", this);
+
+		this.forEach((term, termI) => {
+			this.distribute(termI, true);
+		});
+		bu2_debug_log("Distribute All", this);
+
+		this.bufordSort();
+		bu2_debug_log("Sort", this);
+		this.simplify();
+		bu2_debug_log("Simplify", this);
+
+		bu2_debug_groupEnd();
+		bu2_debug_log("Compress Expression", this);
+		return this;
 	}
 }
+
+
+
+
 
 //---------------------------------------------------------------------------------two sided equation
 class bu2_Equation {
@@ -450,7 +532,6 @@ class bu2_Equation {
 		} //slice loop
 		expressionArray.push(expressionBuild);
 		
-		//bu2_debug_log("sliceAtExpressions", "out", [expressionArray.slice(), operations.slice()]);
 		return [expressionArray, operations];
 	}
 
@@ -459,16 +540,12 @@ class bu2_Equation {
 	right = null;
 
 	constructor(mathString) {
-		bu2_debug_groupC(`Equation constructor: ${mathString}`);
-
 		let sliced = this.#sliceAtExpressions(mathString);
 		if (sliced[0].length > 2) throw new Buford2Error("bu2_TwoSidedEquation cannot have more than 2 expressions!");
 
 		this.left = new bu2_Expression(sliced[0][0]);
 		this.right = new bu2_Expression(sliced[0][1]);
 		this.operation = bu2_operationSymbols.indexOf(sliced[1][0]);
-
-		bu2_debug_groupEnd();
 	}
 
 
@@ -478,24 +555,11 @@ class bu2_Equation {
 		this.right = this.left.slice();
 		this.left = oldRight;
 	}
-
-	//------------------------------------------------------move terms
-	moveTerms(termSide, ...termIndexes) {
-		let reciever = (termSide === 1) ? 0 : 1;
-		
-		termIndexes.forEach((index) => {
-			let term = this[termSide][index];
-
-			term.constant *= -1;
-			this[reciever].push(term);
-		});
-
-		//remove moved elements from original place
-		this[termSide] = this[termSide].filter((e, i) => !termIndexes.includes(i));
-
-		bu2_debug_log("bu2_TwoSidedEquation", "moveTerms", "terms", ...termIndexes, "move to side", termSide);
-	}
 }
+
+
+
+
 
 
 
