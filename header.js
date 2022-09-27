@@ -17,23 +17,25 @@ class Buford2Error extends Error {
 }
 
 let titleColor = "color: #c63915";
+let logColor = "color: #a3642a";
 let arrowColorOut = "color: #1da588";
 let arrowColorIn = "color: #b144c9";
 let normalColor = "color: #878d94";
 
 function bu2_debug_log(title, output) {
 	if (bu2_doDebug) {
-		if (typeof output === "string") console.log(`%c${title} %c=> %c${output}`, titleColor, arrowColorOut, normalColor);
+		if (output === undefined) console.log(`%c! ${title} !`, logColor);
 
-		else console.log(`%c${title} %c=> %c${bu2_toString(output, "no parenthesis")}`, titleColor, arrowColorOut, normalColor);
+		else if (typeof output === "string") console.log(`%c${title} %c=> %c${output}`, logColor, arrowColorOut, normalColor);
+
+		else console.log(`%c${title} %c=> %c${bu2_toString(output, "no parenthesis")}`, logColor, arrowColorOut, normalColor);
 	}
 }
 function bu2_debug_group(title, input, collapsed=1) {
 	if (bu2_doDebug) {
 		let string = (typeof input === "string") ? input : bu2_toString(input, "no parenthesis");
-		if (collapsed) console.groupCollapsed(`%c${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
-		else console.group(`%c${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
-		
+		if (collapsed) console.groupCollapsed(`%c>> ${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
+		else console.group(`%c>> ${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
 	}
 }
 function bu2_debug_groupEnd() {
@@ -599,7 +601,7 @@ function bu2_toString(value, mode="normal") {
 	else if (value instanceof bu2_Equation) {
 		side1 = bu2_toString(value.left, "no parenthesis");
 		side2 = bu2_toString(value.right, "no parenthesis");
-		return side1 + ` ${bu2_operationSymbols[value.operation]} ` + side2;
+		return (side1 || '0') + ` ${bu2_operationSymbols[value.operation]} ` + (side2 || '0');
 	}
 	else console.error(`bu2_toString did not recognize value:`, value);
 }
