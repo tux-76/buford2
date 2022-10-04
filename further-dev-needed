@@ -1,4 +1,0 @@
-~ bu2_Term => simplify => "simpCoef.exponent += coef.exponent;"
-    - Exponents will not always be numerical. Must be updated with support for un-numerical exponents
-~ bu2_Expression => distibute
-    - Does not take into account the exponent of the expression.

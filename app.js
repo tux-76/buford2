@@ -7,7 +7,9 @@
 	 ~ "double sided solve"
 */
 
-
+//===================================================================================
+//-----------------------------------------------------------------------------Buford2
+//===================================================================================
 function Buford2 (mode, ...args) {
 	bu2_debug_group(`Buford2`, `"${args[0]}"`, 0);
 	bu2_debug_log("Mode", mode);
@@ -24,62 +26,62 @@ function Buford2 (mode, ...args) {
 	else if (mode === "double sided solve") retr = bu2_doubleSidedSolve(new bu2_Equation(string), bu2_const_variables.indexOf(args[1]));
 
 
-	bu2_debug_groupEnd();
-	bu2_debug_log("Buford2", retr);
+	bu2_debug_groupEnd("Buford2", retr);
 	return bu2_toString(retr, "no parenthesis");
 }
 
 
+//===================================================================================
 //----------------------------------------------------------------simplify expression
+//===================================================================================
 function bu2_simplifyExpression(expression) {
 	bu2_debug_group("Simplify Expression", expression);
 
 	expression.compress();
 
-	bu2_debug_groupEnd();
-	bu2_debug_log("Simplify Expression", expression);
+	bu2_debug_groupEnd("Simplify Expression", expression);
 	return expression;
 }
 
+//===================================================================================
 //-----------------------------------------------------------------double sided solve
+//===================================================================================
 function bu2_doubleSidedSolve(equation, variable) {
 	bu2_debug_group("Double Sided Solve", equation);
 
-	bu2_simplifyExpression(equation.left);
-	bu2_simplifyExpression(equation.right);
+	//------------------------------------------------------------------term phase
+	function termPhase() {
+		bu2_debug_group("Term Phase", equation);
+		//move terms in L without variable to R
+		equation.left = equation.left.filter((term) => {
+			if (term.hasVariable(variable)) return true;
+			else {
+				let termCopy = term.copy();
+				termCopy.constant *= -1;
+				equation.right.push(termCopy);
+			}
+		});
+		//simplify R
+		equation.right.simplify();
+		bu2_debug_log("Move non-variables to R, simplify R", equation);
+		//move terms in R without variable to L
+		equation.right = equation.right.filter((term) => {
+			if (!term.hasVariable(variable)) return true;
+			else {
+				let termCopy = term.copy();
+				termCopy.constant *= -1;
+				equation.left.push(termCopy);
+			}
+		});
+		//simplify L
+		equation.left.simplify();
+		bu2_debug_log("Move non-variables to L, simplify L", equation);
+		bu2_debug_groupEnd("Term Phase", equation); //end term phase
+	}
 
-	//= term phase =====================================
-	bu2_debug_group("Term Phase", equation);
-	//move terms in L without variable to R
-	equation.left = equation.left.filter((term) => {
-		if (term.hasVariable(variable)) return true;
-		else {
-			let termCopy = term.copy();
-			termCopy.constant *= -1;
-			equation.right.push(termCopy);
-		}
-	});
-	//simplify R
-	equation.right.simplify();
-	bu2_debug_log("Move non-variables to R, simplify R", equation);
-	//move terms in R without variable to L
-	equation.right = equation.right.filter((term) => {
-		if (!term.hasVariable(variable)) return true;
-		else {
-			let termCopy = term.copy();
-			termCopy.constant *= -1;
-			equation.left.push(termCopy);
-		}
-	});
-	//simplify L
-	equation.left.simplify();
-	bu2_debug_log("Move non-variables to L, simplify L", equation);
-	bu2_debug_groupEnd(); //end term phase
-	bu2_debug_log("Term Phase", equation);
-
-	//= factor phase ==========================================
-	if (equation.left.length === 1) {
-		bu2_debug_log("Variable reduced to 1 term, entering factor phase.");
+	//------------------------------------------------------------------factor phase
+	function factorPhase() {
+		bu2_debug_log("Variable reduced to 1 term");
 		bu2_debug_group("Factor Phase", equation);
 
 		let term = equation.left[0];
@@ -88,14 +90,41 @@ function bu2_doubleSidedSolve(equation, variable) {
 			rightTerm.constant /= term.constant;
 		});
 		term.constant = 1;
-		bu2_debug_log("Move Variables's Constant", equation);
+		bu2_debug_log("Move Target's Constant", equation);
 		
-		bu2_debug_groupEnd();
-		bu2_debug_log("Factor Phase", equation);
+		//move other variables
+		let removedCoefs = [];
+		term.coefficients = term.coefficients.filter((coef) => { // remove extra coefs from term and add to array
+			if (coef.hasVariable(variable) === false) {
+				removedCoefs.push(coef);
+				return false;
+			} else return true;
+		});
+		equation.right.forEach((term) => { // add the extras to the other side
+			term.coefficients = term.coefficients.concat(removedCoefs.map(coef => {
+				let newCoef = coef.copy();
+				newCoef.exponent *= -1;
+				return newCoef;
+			}));
+		});
+		equation.right.simplify();
+		bu2_debug_log("Move Target's Other Variables", equation)
+
+		bu2_debug_groupEnd("Factor Phase", equation);
 	}
 
-	bu2_debug_groupEnd();
-	bu2_debug_log("Double Sided Solve", equation);
+
+	//-------------------------------------------------------------------main
+	bu2_simplifyExpression(equation.left);
+	bu2_simplifyExpression(equation.right);
+
+	termPhase();
+
+	if (equation.left.length === 1) {
+		factorPhase();
+	}
+
+	bu2_debug_groupEnd("Double Sided Solve", equation);
 	return equation;
 }
 
