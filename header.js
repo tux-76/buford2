@@ -34,12 +34,15 @@ function bu2_debug_log(title, output) {
 function bu2_debug_group(title, input, collapsed=1) {
 	if (bu2_doDebug) {
 		let string = (typeof input === "string") ? input : bu2_toString(input, "no parenthesis");
-		if (collapsed) console.groupCollapsed(`%c>> ${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
-		else console.group(`%c>> ${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
+		if (collapsed) console.groupCollapsed(`%c${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
+		else console.group(`%c${title} %c<= %c${string}`, titleColor, arrowColorIn, normalColor);
 	}
 }
-function bu2_debug_groupEnd() {
-	if (bu2_doDebug) console.groupEnd()
+function bu2_debug_groupEnd(title, output) {
+	if (bu2_doDebug) {
+		console.groupEnd();
+		bu2_debug_log(title, output)
+	}
 }
 
 //==========================================================================================================
@@ -212,6 +215,11 @@ class bu2_Coefficient {
 		return hasVar;
 	}
 
+	//--------------------------------------------------------------copy
+	copy() {
+		return new bu2_Coefficient(bu2_toString(this));
+	}
+
 	//---------------------------------------------------------------is numerical
 	isNumerical() {return (!isNaN(this.base) && !isNaN(this.exponent))}; //determines if coefficient has objects or variables
 
@@ -358,6 +366,19 @@ class bu2_Term {
 		this.coefficients = simplified;
 	}
 
+	//------------------------------------------------flatten exponent
+	flattenExponent(coefIndex) {
+		let coef = this.coefficients[coefIndex];
+		if (!isNaN(coef.exponent)) {
+			for (let i = 0; i < coef.exponent-1; i++) {
+				let newCoef = coef.copy();
+				newCoef.exponent = 1;
+				this.coefficients.push(newCoef);
+			}
+			coef.exponent = 1;
+		} else console.error("Flatten exponent only accepts numerical exponents.")
+	}
+
 	//---------------------------------------is distributable
 	get isDistributable() {
 		let flag = false;
@@ -483,14 +504,17 @@ class bu2_Expression extends Array {
 
 		return 0;
 	}
+	distributeAll(recursive=true) {
+		this.slice().forEach(term => {
+			this.distribute(this.indexOf(term), true);
+		});
+	}
 
 	//----------------------------------------------------flatten
 	compress() {
 		bu2_debug_group("Compress Expression", this);
 
-		this.forEach((term, termI) => {
-			this.distribute(termI, true);
-		});
+		this.distributeAll()
 		bu2_debug_log("Distribute All", this);
 
 		this.bufordSort();
@@ -498,8 +522,7 @@ class bu2_Expression extends Array {
 		this.simplify();
 		bu2_debug_log("Simplify", this);
 
-		bu2_debug_groupEnd();
-		bu2_debug_log("Compress Expression", this);
+		bu2_debug_groupEnd("Compress Expression", this);
 		return this;
 	}
 }
