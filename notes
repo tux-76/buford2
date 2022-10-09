@@ -3,8 +3,8 @@
 
 
 ==================================================================Short term
-- terms and coefficients will not delete when necessary (0ab, b^0)
 - no dividing in output string, [4a/b] stays as [4a*b^-1]
+- term.flattenExponent => does not account for negative exponents
 
 
 ==================================================================Long term

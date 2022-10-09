@@ -58,7 +58,7 @@ export default class Term {
 	}//sliceAtFactors
 
 
-	//---------------------------------------------constructor
+	//-------------------------------------------------------------------------------------------constructor
 	constant = 1;
 	coefficients = [];
 	#stringConstuctor(mathString) {
@@ -87,7 +87,7 @@ export default class Term {
 		else this.#manualConstructor(arg1, arg2);
 	}
 
-	//------------------------------------------has variable
+	//-----------------------------------------------------------------------------------------------has variable
 	hasVariable(variable=-1) {
 		let hasVar = false;
 		this.coefficients.forEach(coef => {
@@ -96,12 +96,17 @@ export default class Term {
 		return hasVar;
 	}
 
-	//-----------------------------------------copy
+	//---------------------------------------------------------------------------------------------compare terms
+	compareTerms(term) {
+		return (bu2_toString(this, "no constant") == bu2_toString(term, "no constant"));
+	}
+
+	//------------------------------------------------------------------------------------------------copy
 	copy() {
 		return new Term(toString(this));
 	}
 
-	//-----------------------------------------multiply
+	//--------------------------------------------------------------------------------------------------multiply
 	multiply(term) {
 		this.constant *= term.constant;
 		term.coefficients.forEach(coef => {
@@ -109,7 +114,7 @@ export default class Term {
 		});
 	}
 
-	//-----------------------------------------simplify
+	//-------------------------------------------------------------------------------------------------------simplify
 	simplify() {
 		let coefs = this.coefficients.filter(coef => {
 			coef.simplify();
@@ -139,7 +144,7 @@ export default class Term {
 		});
 	}
 
-	//------------------------------------------------flatten exponent
+	//--------------------------------------------------------------------------------------------------------flatten exponent
 	flattenExponent(coefIndex) {
 		let coef = this.coefficients[coefIndex];
 		if (!isNaN(coef.exponent)) {
@@ -152,7 +157,7 @@ export default class Term {
 		} else console.error("Flatten exponent only accepts numerical exponents.")
 	}
 
-	//---------------------------------------is distributable
+	//------------------------------------------------------------------------------------------------------is distributable
 	get isDistributable() {
 		let flag = false;
 		this.coefficients.forEach(coef => {

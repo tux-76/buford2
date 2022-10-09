@@ -1,5 +1,4 @@
-
-import * as toMachine from "../functions/toMachine.js";
+import * as func from "../functions/main.js";
 import {Term} from "./main.js";
 
 export default class Expression extends Array {
@@ -57,7 +56,7 @@ export default class Expression extends Array {
 
 	//--------------------------------------------------------------------------------------------------buford sort
 	bufordSort() {
-		bu2_sortArrayObject(this);
+		sort.sortArrayObject(this);
 	}
 
 	//---------------------------------------------------------------------------------------------simplify
@@ -70,7 +69,7 @@ export default class Expression extends Array {
 			let matchFound = false;
 			for (let i = 0; (i < simplified.length) && !matchFound; i++) {
 				let simpTerm = simplified[i];
-				if (bu2_compareTerms(term, simpTerm)) {
+				if (Term.compareTerms(term, simpTerm)) {
 					simpTerm.constant += term.constant;
 					matchFound = true;
 				}

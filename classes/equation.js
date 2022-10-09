@@ -35,7 +35,7 @@ export default class Equation {
 
 	constructor(mathString) {
 		let sliced = this.#sliceAtExpressions(mathString);
-		if (sliced[0].length > 2) throw new Buford2Error("Equation cannot have more than 2 expressions!");
+		if (sliced[0].length > 2) console.error("Equation cannot have more than two expressions! (Try system of equations!)");
 
 		this.left = new Expression(sliced[0][0]);
 		this.right = new Expression(sliced[0][1]);
