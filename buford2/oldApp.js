@@ -118,6 +118,8 @@ function bu2_doubleSidedSolve(equation, variable) {
 	bu2_simplifyExpression(equation.left);
 	bu2_simplifyExpression(equation.right);
 
+	bu2_sort()
+	
 	termPhase();
 
 	if (equation.left.length === 1) {
@@ -142,6 +144,7 @@ Timeline:
 	-MON 20:08 09/12/2022: Changed the data structure once again. This time we have classes for Expression, Term, and Coefficient. This allows for more specialized methods involving each.
 	-SUN 09:34 09/25/2022: First operational version of "simplify expression" mode!
 	-MON 19:36 09/26/2022: We are now caught up to the first version of Buford in functionality! Yet this time with a long road of improvement ahead :)
+	-THU 19:52 10/06/2022: Attempt to change the structure to a more modular based approach. A little bit difficult because I don't know how to keep all the ties to other functions I've created.
 */
 
 
