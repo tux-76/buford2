@@ -1,4 +1,4 @@
-import * as func from "../private-func/main.js";
+import { toMachine, debug, sort } from "../private-func/main.js";
 import {Term} from "./main.js";
 
 export default class Expression extends Array {
@@ -69,7 +69,7 @@ export default class Expression extends Array {
 			let matchFound = false;
 			for (let i = 0; (i < simplified.length) && !matchFound; i++) {
 				let simpTerm = simplified[i];
-				if (Term.compareTerms(term, simpTerm)) {
+				if (term.compareTerms(simpTerm)) {
 					simpTerm.constant += term.constant;
 					matchFound = true;
 				}
@@ -124,17 +124,17 @@ export default class Expression extends Array {
 
 	//----------------------------------------------------------------------------------------------------compress
 	compress() {
-		bu2_debug_group("Compress Expression", this);
+		debug.group("Compress Expression", this);
 
 		this.distributeAll()
-		bu2_debug_log("Distribute All", this);
+		debug.log("Distribute All", this);
 
 		this.bufordSort();
-		bu2_debug_log("Sort", this);
+		debug.log("Sort", this);
 		this.simplify();
-		bu2_debug_log("Simplify", this);
+		debug.log("Simplify", this);
 
-		bu2_debug_groupEnd("Compress Expression", this);
+		debug.groupEnd("Compress Expression", this);
 		return this;
 	}
 }

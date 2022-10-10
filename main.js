@@ -1,4 +1,4 @@
-import * as debug from "./module/private-func/debug.js";
+import { debug, toString } from "./module/private-func/main.js"
 import * as funcs from "./module/public-func/main.js";
 import * as classes from "./module/classes/main.js";
 import * as constants from "./module/constants.js";
@@ -8,9 +8,8 @@ import * as constants from "./module/constants.js";
 	 ~ "simplify expression"
 	 ~ "double sided solve"
 */
-
 function main(mode, ...args) {
-	debug.group(`buford2`, `"${args[0]}"`, 0);
+	debug.group(`Buford2`, `"${args[0]}"`, 0);
 	debug.log("Mode", mode);
 	let retr;
 
@@ -26,7 +25,7 @@ function main(mode, ...args) {
 
 
 	debug.groupEnd("Buford2", retr);
-	return debug.toString(retr, "no parenthesis");
+	return toString(retr, "no parenthesis");
 }
 
 let Buford2 = {};

@@ -98,7 +98,7 @@ export default class Term {
 
 	//---------------------------------------------------------------------------------------------compare terms
 	compareTerms(term) {
-		return (bu2_toString(this, "no constant") == bu2_toString(term, "no constant"));
+		return (toString(this, "no constant") == toString(term, "no constant"));
 	}
 
 	//------------------------------------------------------------------------------------------------copy
