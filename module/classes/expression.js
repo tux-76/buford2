@@ -1,4 +1,4 @@
-import * as func from "../functions/main.js";
+import * as func from "../private-func/main.js";
 import {Term} from "./main.js";
 
 export default class Expression extends Array {

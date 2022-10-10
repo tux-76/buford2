@@ -1,6 +1,6 @@
 import { Variable, Expression } from "./main.js";
-import * as toMachine from "../functions/toMachine.js";
-import toString from "../functions/toString.js";
+import * as toMachine from "../private-func/toMachine.js";
+import toString from "../private-func/toString.js";
 
 export default class Coefficient {
 	#sliceAtExponent(string) {
