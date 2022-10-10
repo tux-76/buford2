@@ -1,11 +1,13 @@
-import { debug, sort } from "../private-func/main.js";
-import simplifyExpression from "./simplifyExpression.js";
+import { debug, sort } from "../private-func.js";
+import * as constants from "../constants.js"
 
 
 export default function doubleSidedSolve(equation, variable) {
 	debug.group("Double Sided Solve", equation);
 
-    //------------------------------------------------------------------term phase
+    //===========================================================================================
+    //------------------------------------------------------------------------------------term phase
+    //===========================================================================================
     function termPhase() {
         debug.group("Term Phase", equation);
         //move terms in L without variable to R
@@ -35,20 +37,22 @@ export default function doubleSidedSolve(equation, variable) {
         debug.groupEnd("Term Phase", equation); //end term phase
     }
 
-    //------------------------------------------------------------------factor phase
+    //===========================================================================================
+    //------------------------------------------------------------------------------------factor phase
+    //===========================================================================================
     function factorPhase() {
-        debug.log("Variable reduced to 1 term");
         debug.group("Factor Phase", equation);
 
         let term = equation.left[0];
-        //move constant
+
+        //-------------------------------------------------move constant
         equation.right.forEach(rightTerm => {
             rightTerm.constant /= term.constant;
         });
         term.constant = 1;
         debug.log("Move Target's Constant", equation);
         
-        //move other variables
+        //--------------------------------------------move other variables
         let removedCoefs = [];
         term.coefficients = term.coefficients.filter((coef) => { // remove extra coefs from term and add to array
             if (coef.hasVariable(variable) === false) {
@@ -69,19 +73,27 @@ export default function doubleSidedSolve(equation, variable) {
         debug.groupEnd("Factor Phase", equation);
     }
 
-    //====================================================================================
-    //-------------------------------------------------------------------------------main
-    //====================================================================================
-	simplifyExpression(equation.left);
-	simplifyExpression(equation.right);
-
-	sort.sort();
+    //===========================================================================================
+    //-----------------------------------------------------------------------------------------main
+    //===========================================================================================
+    sort.sort(equation);
+	equation.left.compress();
+	equation.right.compress();
+    debug.log("Compress both sides", equation)
 	
+    sort.sort(equation);
 	termPhase();
 
+    sort.sort(equation);
 	if (equation.left.length === 1) {
-		factorPhase();
-	}
+        debug.log("Variable reduced to 1 term");
+        factorPhase();
+    } else if (equation.left.length > 1) {
+        debug.log(`Variable found in ${equation.left.length} terms`);
+    } else {
+        console.error(`The given variable "${constants.variables[variable]}" was not found!`)
+    }
+    sort.sort(equation);
 
 	debug.groupEnd("Double Sided Solve", equation);
 	return equation;

@@ -1,4 +1,4 @@
-import * as classes from "../classes/main.js";
+import * as classes from "../classes.js";
 import * as constants from "../constants.js";
 
 /*----------------------------------------------------------to string

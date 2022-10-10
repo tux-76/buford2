@@ -2,9 +2,13 @@
 import * as constants from "../constants.js";
 import * as toMachine from "../private-func/toMachine.js";
 import toString from "../private-func/toString.js";
-import {Coefficient, Expression} from "./main.js";
+import {Coefficient, Expression} from "../classes.js";
 
 export default class Term {
+	//========================================================================================================================
+	//-----------------------------------------------------------------------------------------------------------------constructor
+	//========================================================================================================================
+	
 	#sliceAtFactors(string) { //splice the term into it's factors
 		let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
 
@@ -57,7 +61,6 @@ export default class Term {
 		return factors;
 	}//sliceAtFactors
 
-
 	//-------------------------------------------------------------------------------------------constructor
 	constant = 1;
 	coefficients = [];
@@ -87,6 +90,12 @@ export default class Term {
 		else this.#manualConstructor(arg1, arg2);
 	}
 
+
+
+	//========================================================================================================================
+	//-------------------------------------------------------------------------------------------------------------------getters
+	//========================================================================================================================
+
 	//-----------------------------------------------------------------------------------------------has variable
 	hasVariable(variable=-1) {
 		let hasVar = false;
@@ -94,6 +103,15 @@ export default class Term {
 			if (coef.hasVariable(variable)) hasVar = true;
 		});
 		return hasVar;
+	}
+
+	//------------------------------------------------------------------------------------------------------is distributable
+	get isDistributable() {
+		let flag = false;
+		this.coefficients.forEach(coef => {
+			if (coef.base instanceof Expression) flag = true;
+		});
+		return flag;
 	}
 
 	//---------------------------------------------------------------------------------------------compare terms
@@ -105,6 +123,12 @@ export default class Term {
 	copy() {
 		return new Term(toString(this));
 	}
+
+	
+
+	//========================================================================================================================
+	//-------------------------------------------------------------------------------------------------------------------modifiers
+	//========================================================================================================================
 
 	//--------------------------------------------------------------------------------------------------multiply
 	multiply(term) {
@@ -148,21 +172,12 @@ export default class Term {
 	flattenExponent(coefIndex) {
 		let coef = this.coefficients[coefIndex];
 		if (!isNaN(coef.exponent)) {
-			for (let i = 0; i < coef.exponent-1; i++) {
+			for (let i = 0; i < Math.abs(coef.exponent)-1; i++) {
 				let newCoef = coef.copy();
-				newCoef.exponent = 1;
+				newCoef.exponent = (coef.exponent > 0) ? 1 : -1;
 				this.coefficients.push(newCoef);
 			}
-			coef.exponent = 1;
+			coef.exponent = (coef.exponent > 0) ? 1 : -1;
 		} else console.error("Flatten exponent only accepts numerical exponents.")
-	}
-
-	//------------------------------------------------------------------------------------------------------is distributable
-	get isDistributable() {
-		let flag = false;
-		this.coefficients.forEach(coef => {
-			if (coef.base instanceof Expression) flag = true;
-		});
-		return flag;
 	}
 }

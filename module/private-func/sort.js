@@ -1,5 +1,5 @@
 import * as constants from "../constants.js";
-import * as classes from "../classes/main.js";
+import * as classes from "../classes.js";
 import toString from "./toString.js";
 
 //------------------------------------------------------------sort

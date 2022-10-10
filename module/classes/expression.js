@@ -1,7 +1,11 @@
-import { toMachine, debug, sort } from "../private-func/main.js";
-import {Term} from "./main.js";
+import { toMachine, debug, sort } from "../private-func.js";
+import {Term} from "../classes.js";
 
 export default class Expression extends Array {
+	//========================================================================================================================
+	//-----------------------------------------------------------------------------------------------------------------constructor
+	//========================================================================================================================
+	
 	#sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
 		let slicedTerms = []; //an array for the spliced terms
 		let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
@@ -45,6 +49,11 @@ export default class Expression extends Array {
 		} else super(string);
 	}
 
+
+	//========================================================================================================================
+	//-------------------------------------------------------------------------------------------------------------------getters
+	//========================================================================================================================
+
 	//------------------------------------------------------------------------------------------has variable
 	hasVariable(variable=-1) {
 		let hasVar = false;
@@ -53,6 +62,10 @@ export default class Expression extends Array {
 		});
 		return hasVar;
 	}
+
+	//========================================================================================================================
+	//-------------------------------------------------------------------------------------------------------------------modifiers
+	//========================================================================================================================
 
 	//--------------------------------------------------------------------------------------------------buford sort
 	bufordSort() {
@@ -115,7 +128,7 @@ export default class Expression extends Array {
 		return 0;
 	}
 
-	//-------------------------------------------------------------------------------------------distribute all
+	//-----------------------------------------------------------------------------------------------------distribute all
 	distributeAll(recursive=true) {
 		this.slice().forEach(term => {
 			this.distribute(this.indexOf(term), true);
@@ -124,17 +137,13 @@ export default class Expression extends Array {
 
 	//----------------------------------------------------------------------------------------------------compress
 	compress() {
-		debug.group("Compress Expression", this);
-
-		this.distributeAll()
-		debug.log("Distribute All", this);
-
+		this.distributeAll();
 		this.bufordSort();
-		debug.log("Sort", this);
 		this.simplify();
-		debug.log("Simplify", this);
+	}
 
-		debug.groupEnd("Compress Expression", this);
-		return this;
+	//------------------------------------------------------------------------------------------------------undistribute
+	undistribute() {
+		
 	}
 }

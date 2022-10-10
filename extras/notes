@@ -4,7 +4,7 @@
 
 ==================================================================Short term
 - no dividing in output string, [4a/b] stays as [4a*b^-1]
-- term.flattenExponent => does not account for negative exponents
+- negative exponents cannot be inputted
 
 
 ==================================================================Long term
