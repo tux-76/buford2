@@ -1,5 +1,5 @@
-import { debug, toString } from "./module/private-func.js"
-import * as funcs from "./module/public-func.js";
+import { debug, toString } from "./module/algebra-private.js"
+import * as funcs from "./module/public.js";
 import * as classes from "./module/classes.js";
 import * as constants from "./module/constants.js";
 
@@ -29,11 +29,11 @@ function main(mode, ...args) {
 }
 
 let Buford2 = {};
-Buford2.simplifyExpression = (...args) => main("simplify expression", ...args);
-Buford2.doubleSidedSolve = (...args) => main("double sided solve", ...args);
+Buford2.alge.simplifyExpression = (...args) => main("simplify expression", ...args);
+Buford2.alge.doubleSidedSolve = (...args) => main("double sided solve", ...args);
 
 export default Buford2;
-console.log("Buford2 module exported.")
+console.log("Buford2 module exported.");
 
 /*
 -------Written by c1uq92-------

@@ -1,4 +1,4 @@
-import * as debug from "../private-func/debug.js";
+import * as debug from "../../private-func/debug.js";
 
 export default function simplifyExpression(expression) {
 	debug.group("Simplify Expression", expression);

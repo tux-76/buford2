@@ -1,5 +1,5 @@
-import { toMachine, debug, sort } from "../private-func.js";
-import {Term} from "../classes.js";
+import { toMachine, debug, sort } from "../algebra-private.js";
+import { Variable, Term } from "../classes.js";
 
 export default class Expression extends Array {
 	//========================================================================================================================
@@ -143,7 +143,24 @@ export default class Expression extends Array {
 	}
 
 	//------------------------------------------------------------------------------------------------------undistribute
-	undistribute() {
+	undistribute(...termIndexes) {
+		// get terms
+		let terms = [];
+		if (termIndexes.length > 0) termIndexes.forEach((e) => terms.push(this[e]))
+		else this.forEach((e) => terms.push(e))
+
+		// get variables
+		let allVariables = []
+		terms.forEach((term) => {
+			term.coefficients.forEach((coef) => {
+				if (coef.base instanceof Variable) {
+					if (!allVariables.includes(coef.base.index)) allVariables.push(coef.base.index);
+				}
+			});
+		});
+		console.log(terms, allVariables);
+
+		// undistribute constant
 		
 	}
 }

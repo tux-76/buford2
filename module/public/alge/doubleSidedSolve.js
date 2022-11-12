@@ -1,5 +1,5 @@
-import { debug, sort } from "../private-func.js";
-import * as constants from "../constants.js"
+import { debug, sort } from "../../algebra-private.js";
+import * as constants from "../../constants.js"
 
 
 export default function doubleSidedSolve(equation, variable) {

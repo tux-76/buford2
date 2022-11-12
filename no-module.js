@@ -1,7 +1,7 @@
 import Buford2 from "./main.js";
 import * as classes from "./module/classes.js";
-import * as priv from "./module/private-func.js";
-import * as publ from "./module/public-func.js";
+import * as priv from "./module/algebra-private.js";
+import * as publ from "./module/public.js";
 
 window.bu2 = Buford2;
 window.bu2.class = classes;
