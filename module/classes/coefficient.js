@@ -1,6 +1,6 @@
 import { Variable, Expression } from "../classes.js";
-import * as toMachine from "../private-func/toMachine.js";
-import toString from "../private-func/toString.js";
+import * as toMachine from "../private-alge/toMachine.js";
+import toString from "../private-alge/toString.js";
 
 
 export default class Coefficient {

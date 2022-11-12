@@ -1,7 +1,7 @@
 
 import * as constants from "../constants.js";
-import * as toMachine from "../private-func/toMachine.js";
-import toString from "../private-func/toString.js";
+import * as toMachine from "../private-alge/toMachine.js";
+import toString from "../private-alge/toString.js";
 import {Coefficient, Expression} from "../classes.js";
 
 export default class Term {
