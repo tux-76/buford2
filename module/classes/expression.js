@@ -1,4 +1,4 @@
-import { toMachine, debug, sort } from "../algebra-private.js";
+import { toMachine, debug, sort } from "../private-alge.js";
 import { Variable, Term } from "../classes.js";
 
 export default class Expression extends Array {

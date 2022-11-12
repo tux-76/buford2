@@ -1,7 +1,9 @@
-import { debug, toString } from "./module/algebra-private.js"
-import * as funcs from "./module/public.js";
 import * as classes from "./module/classes.js";
 import * as constants from "./module/constants.js";
+import { debug, toString } from "./module/private-alge.js"
+
+import * as alge from "./module/public/alge.js";
+import * as factor from "./module/public/factor.js"
 
 /*
 	Function modes (arguement 1):
@@ -20,17 +22,19 @@ function main(mode, ...args) {
 	
 
 	//functions
-	if (mode === "simplify expression") retr = funcs.simplifyExpression(new classes.Expression(string));
-	else if (mode === "double sided solve") retr = funcs.doubleSidedSolve(new classes.Equation(string), constants.variables.indexOf(args[1]));
+	if (mode === "simplify expression") retr = alge.simplifyExpression(new classes.Expression(string));
+	else if (mode === "double sided solve") retr = alge.doubleSidedSolve(new classes.Equation(string), constants.variables.indexOf(args[1]));
 
 
 	debug.groupEnd("Buford2", retr);
 	return toString(retr, "no parenthesis");
 }
 
-let Buford2 = {};
+let Buford2 = {alge:{}};
 Buford2.alge.simplifyExpression = (...args) => main("simplify expression", ...args);
 Buford2.alge.doubleSidedSolve = (...args) => main("double sided solve", ...args);
+
+Buford2.factor = factor;
 
 export default Buford2;
 console.log("Buford2 module exported.");

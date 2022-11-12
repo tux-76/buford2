@@ -1,4 +1,4 @@
-import { debug, sort } from "../../algebra-private.js";
+import { debug, sort } from "../../private-alge.js";
 import * as constants from "../../constants.js"
 
 
