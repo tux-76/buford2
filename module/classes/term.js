@@ -1,7 +1,7 @@
 
 import * as constants from "../constants.js";
 import * as toMachine from "../private-alge/toMachine.js";
-import toString from "../private-alge/toString.js";
+import { toString, sort } from "../private-alge.js";
 import {Coefficient, Expression} from "../classes.js";
 
 export default class Term {
@@ -129,6 +129,15 @@ export default class Term {
 	//========================================================================================================================
 	//-------------------------------------------------------------------------------------------------------------------modifiers
 	//========================================================================================================================
+	//-------------------------------------------------------------------------add
+	/*
+		- BOTH THIS AND TERM MUST BE SORTED
+		- COEFFICIENTS MUST BE THE SAME!
+	*/
+	add(term) {
+		this.constant += term.constant
+		this.coefficients.forEach((coef, i) => coef.exponent += term.coefficients[i].exponent)
+	}
 
 	//--------------------------------------------------------------------------------------------------multiply
 	multiply(term) {

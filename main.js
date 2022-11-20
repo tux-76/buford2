@@ -5,12 +5,15 @@ import { debug, toString } from "./module/private-alge.js"
 import * as alge from "./module/public/alge.js";
 import * as factor from "./module/public/factor.js"
 
+let Buford2 = {alge:{}};
+Buford2.factor = factor;
+
 /*
 	Function modes (arguement 1):
 	 ~ "simplify expression"
 	 ~ "double sided solve"
 */
-function main(mode, ...args) {
+function algebraFunctionWrap(mode, ...args) {
 	debug.group(`Buford2`, `"${args[0]}"`, 0);
 	debug.log("Mode", mode);
 	let retr;
@@ -30,11 +33,9 @@ function main(mode, ...args) {
 	return toString(retr, "no parenthesis");
 }
 
-let Buford2 = {alge:{}};
-Buford2.alge.simplifyExpression = (...args) => main("simplify expression", ...args);
-Buford2.alge.doubleSidedSolve = (...args) => main("double sided solve", ...args);
 
-Buford2.factor = factor;
+Buford2.alge.simplifyExpression = (...args) => algebraFunctionWrap("simplify expression", ...args);
+Buford2.alge.doubleSidedSolve = (...args) => algebraFunctionWrap("double sided solve", ...args);
 
 export default Buford2;
 console.log("Buford2 module exported.");

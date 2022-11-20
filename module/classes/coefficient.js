@@ -81,16 +81,14 @@ export default class Coefficient {
 	//---------------------------------------------------------------has variable
 	hasVariable(variable=-1) {
 		let hasVar = false;
-		if (this.base instanceof Variable) {
+		if (this.base instanceof Variable)
 			if (variable === -1 || this.base.index === variable) hasVar = true;
-		} else if (this.base instanceof Expression) {
+		else if (this.base instanceof Expression) 
 			if (this.base.hasVariable(variable)) hasVar = true;
-		}
-		if (this.exponent instanceof Variable) {
+		if (this.exponent instanceof Variable)
 			if (variable === -1 || this.exponent.index === variable) hasVar = true;
-		} else if (this.exponent instanceof Expression) {
+		else if (this.exponent instanceof Expression)
 			if (this.exponent.hasVariable(variable)) hasVar = true;
-		}
 		return hasVar;
 	}
 

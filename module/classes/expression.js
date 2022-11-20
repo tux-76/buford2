@@ -1,10 +1,11 @@
-import { toMachine, debug, sort } from "../private-alge.js";
+import { toMachine, toString, debug, sort as bu2_sort } from "../private-alge.js";
 import { Variable, Term } from "../classes.js";
+import { GCF } from "../public/factor.js";
 
 export default class Expression extends Array {
-	//========================================================================================================================
-	//-----------------------------------------------------------------------------------------------------------------constructor
-	//========================================================================================================================
+	//==========================================================================================================
+	//----------------------------------------------------------------------------------------------------constructor
+	//==========================================================================================================
 	
 	#sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
 		let slicedTerms = []; //an array for the spliced terms
@@ -50,9 +51,9 @@ export default class Expression extends Array {
 	}
 
 
-	//========================================================================================================================
-	//-------------------------------------------------------------------------------------------------------------------getters
-	//========================================================================================================================
+	//===========================================================================================================
+	//-----------------------------------------------------------------------------------------------------getters
+	//===========================================================================================================
 
 	//------------------------------------------------------------------------------------------has variable
 	hasVariable(variable=-1) {
@@ -63,13 +64,13 @@ export default class Expression extends Array {
 		return hasVar;
 	}
 
-	//========================================================================================================================
-	//-------------------------------------------------------------------------------------------------------------------modifiers
-	//========================================================================================================================
+	//=======================================================================================================
+	//----------------------------------------------------------------------------------------------------modifiers
+	//=======================================================================================================
 
 	//--------------------------------------------------------------------------------------------------buford sort
 	bufordSort() {
-		sort.sortArrayObject(this);
+		bu2_sort.sortArrayObject(this);
 	}
 
 	//---------------------------------------------------------------------------------------------simplify
@@ -143,24 +144,30 @@ export default class Expression extends Array {
 	}
 
 	//------------------------------------------------------------------------------------------------------undistribute
+	/*  */
 	undistribute(...termIndexes) {
+		debug.group("undistribute", this);
+
 		// get terms
 		let terms = [];
-		if (termIndexes.length > 0) termIndexes.forEach((e) => terms.push(this[e]))
-		else this.forEach((e) => terms.push(e))
+		if (termIndexes.length > 0) termIndexes.forEach((i) => terms.push(this[i]));
+		else this.forEach((term) => terms.push(term.copy()));
+		//sort
+		terms.forEach(term => bu2_sort.sort(term));
+		// make new term with constant set to the gcf of all the terms constants
+		let newTerm = new Term(GCF(...terms.map(term => term.constant)));
+		// divide all terms by gcf
+		terms.forEach((term) => term.constant /= newTerm.constant);
 
-		// get variables
-		let allVariables = []
+		//get common coefficients
+		let commonCoefs = terms[0].coefficients.map(e => toString(e.base));
 		terms.forEach((term) => {
-			term.coefficients.forEach((coef) => {
-				if (coef.base instanceof Variable) {
-					if (!allVariables.includes(coef.base.index)) allVariables.push(coef.base.index);
-				}
-			});
+			commonCoefs = commonCoefs.filter(cCoef => term.coefficients.map(e => toString(e.base)).includes(cCoef));
 		});
-		console.log(terms, allVariables);
+		debug.log("Common coefficients", commonCoefs.toString());
 
-		// undistribute constant
-		
+		console.log(terms);
+		debug.groupEnd("undistribute", newTerm)
+		return newTerm;
 	}
 }

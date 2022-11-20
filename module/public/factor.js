@@ -6,14 +6,14 @@ export function factor(integer, doPairs=false, negativeDomain=false) {
     return factors;
 }
 
-export function gcf(int1, int2) {
+export function GCF(int1, int2, ...extraInts) {
     let factors1 = factor(int1);
     let factors2 = factor(int2);
     let greatestCF = 1;
     factors1.forEach(fac => {
         if (factors2.includes(fac)) greatestCF = fac;
     });
-    return greatestCF;
+    return (extraInts.length === 0) ? greatestCF : GCF(greatestCF, ...extraInts);
 }
 
 // export function lcd(num1, num2) {
