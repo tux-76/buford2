@@ -1,7 +1,7 @@
 
 import * as constants from "../constants.js";
 import * as toMachine from "../private-alge/toMachine.js";
-import { toString, sort } from "../private-alge.js";
+import { toString, sort as bu2_sort } from "../private-alge.js";
 import {Coefficient, Expression} from "../classes.js";
 
 export default class Term {
@@ -136,7 +136,8 @@ export default class Term {
 	*/
 	add(term) {
 		this.constant += term.constant
-		this.coefficients.forEach((coef, i) => coef.exponent += term.coefficients[i].exponent)
+		this.coefficients.forEach((coef, i) => coef.exponent += term.coefficients[i].exponent);
+		bu2_sort.sort(this);
 	}
 
 	//--------------------------------------------------------------------------------------------------multiply
@@ -145,6 +146,7 @@ export default class Term {
 		term.coefficients.forEach(coef => {
 			this.coefficients.push(new Coefficient(coef.base, coef.exponent));
 		});
+		bu2_sort.sort(this);
 	}
 
 	//-------------------------------------------------------------------------------------------------------simplify
@@ -175,6 +177,7 @@ export default class Term {
 			if (coef.base === 1 || coef.exponent === 0) return false;
 			else return true;
 		});
+		bu2_sort.sort(this);
 	}
 
 	//--------------------------------------------------------------------------------------------------------flatten exponent
@@ -187,6 +190,7 @@ export default class Term {
 				this.coefficients.push(newCoef);
 			}
 			coef.exponent = (coef.exponent > 0) ? 1 : -1;
-		} else console.error("Flatten exponent only accepts numerical exponents.")
+		} else console.error("Flatten exponent only accepts numerical exponents.");
+		bu2_sort.sort(this);
 	}
 }

@@ -14,6 +14,8 @@ export function log(title, output) {
 
 		else if (typeof output === "string") console.log(`%c${title} %c=> %c${output}`, logColor, arrowColorOut, normalColor);
 
+		else if (output.constructor === Array) console.log(`%c${title} %c=> %c${output.map(e => toString(e)).toString()}`, logColor, arrowColorOut, normalColor);
+
 		else console.log(`%c${title} %c=> %c${toString(output, "no parenthesis")}`, logColor, arrowColorOut, normalColor);
 	}
 }
@@ -27,6 +29,6 @@ export function group(title, input, collapsed=1) {
 export function groupEnd(title, output) {
 	if (doDebug) {
 		console.groupEnd();
-		log(title, output)
+		log(title, output);
 	}
 }

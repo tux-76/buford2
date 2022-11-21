@@ -1,4 +1,5 @@
-import { debug, sort } from "../../private-alge.js";
+import { debug, sort as bu2_sort, toString } from "../../private-alge.js";
+import { Term, Expression } from "../../classes.js";
 import * as constants from "../../constants.js"
 
 
@@ -37,24 +38,43 @@ export default function doubleSidedSolve(equation, variable) {
         debug.groupEnd("Term Phase", equation); //end term phase
     }
 
+    function multiTerm() {
+        debug.log("Solve for multiple terms", equation.left);
+        // attempt to undistribute
+        if (equation.left.undistribute() !== 1) {
+            // set up variables
+            let target = equation.left[0];
+            let receivers;
+            let factor = new Term(target.constant, target.coefficients.filter(coef => {
+                if (coef.base instanceof Expression) {
+                    receivers = coef.base;
+                    return 0;
+                } else return 1;
+            }));
+
+            // check if variable is factored out
+            if (factor.hasVariable(variable) && !receivers.hasVariable(variable)) {
+                debug.log("Variable sucessfully factored(undistributed) into single term");
+                factorPhase();
+            }
+        }
+    }
     //===========================================================================================
     //------------------------------------------------------------------------------------factor phase
     //===========================================================================================
     function factorPhase() {
         debug.group("Factor Phase", equation);
 
-        let term = equation.left[0];
+        let target = equation.left[0];
 
         //-------------------------------------------------move constant
-        equation.right.forEach(rightTerm => {
-            rightTerm.constant /= term.constant;
-        });
-        term.constant = 1;
+        equation.right.forEach(rightTerm => rightTerm.constant /= target.constant);
+        target.constant = 1;
         debug.log("Move Target's Constant", equation);
-        
+
         //--------------------------------------------move other variables
         let removedCoefs = [];
-        term.coefficients = term.coefficients.filter((coef) => { // remove extra coefs from term and add to array
+        target.coefficients = target.coefficients.filter((coef) => { // remove extra coefs from term and add to array
             if (coef.hasVariable(variable) === false) {
                 removedCoefs.push(coef);
                 return false;
@@ -76,24 +96,21 @@ export default function doubleSidedSolve(equation, variable) {
     //===========================================================================================
     //-----------------------------------------------------------------------------------------main
     //===========================================================================================
-    sort.sort(equation);
 	equation.left.compress();
 	equation.right.compress();
     debug.log("Compress both sides", equation)
 	
-    sort.sort(equation);
 	termPhase();
 
-    sort.sort(equation);
 	if (equation.left.length === 1) {
         debug.log("Variable reduced to 1 term");
         factorPhase();
     } else if (equation.left.length > 1) {
         debug.log(`Variable found in ${equation.left.length} terms`);
+        multiTerm()
     } else {
-        console.error(`The given variable "${constants.variables[variable]}" was not found!`)
+        debug.log(`The given variable "${constants.variables[variable]}" was not found`)
     }
-    sort.sort(equation);
 
 	debug.groupEnd("Double Sided Solve", equation);
 	return equation;

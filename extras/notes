@@ -5,6 +5,7 @@
 ==================================================================Short term
 - no dividing in output string, [4a/b] stays as [4a*b^-1]
 - negative exponents cannot be inputted
+- COPY DOES NOT WORK BECAUSE OF THE ABOVE!!! IMPORTANT FIX!!!!
 
 
 ==================================================================Long term

@@ -27,14 +27,12 @@ export function sortArrayObject(array) { //sorts array objects (term's coefficen
 
 	//create and organize sortedStrArr
 	let sortedStrArr = correspondingStrArr.slice().sort();
-	sortedStrArr.slice().forEach((e, i) => {
-		if (constants.parenthesis.includes(e[0])) { //if the first character is a parenthesis
-			sortedStrArr.splice(i, 1); //remove the element
-			sortedStrArr.push(e); //put it at the end
-		}
-	})
 
 	//create sorted array with the actual values
 	let sortedArray = sortedStrArr.map((string) => array[correspondingStrArr.indexOf(string)]);
 	sortedArray.forEach((str, i) => array[i] = str); //set this object's values to the sorted array
+}
+
+export function findObject(needle, haystack=[]) {
+	return haystack.map(e => toString(e)).indexOf(toString(needle));
 }
