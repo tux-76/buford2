@@ -1,3 +1,4 @@
+import * as constants from "../constants.js"
 import { toMachine, toString, debug, sort as bu2_sort } from "../private-alge.js";
 import { Variable, Coefficient, Term } from "../classes.js";
 import { GCF } from "../public/factor.js";
@@ -8,34 +9,7 @@ export default class Expression extends Array {
 	//==========================================================================================================
 	
 	#sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
-		let slicedTerms = []; //an array for the spliced terms
-		let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
-		
-		let termBuild = ""; //create a string for concatinating chars to 
-		for (let i = 0; i<string.length; i++) { //start slice loop
-			if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no open parenthesis
-				if (string[i] === '+') { //if the character is a '+'
-					//push the term and empty the builder
-					slicedTerms.push(termBuild);
-					termBuild = "";
-				} else if (string[i] === '-') { //if the character is a '-'
-					//push the term and empty the builder
-					if (termBuild !== "") slicedTerms.push(termBuild);
-					termBuild = "-"; //add negative
-				} else { //if the character is neither
-					termBuild += string[i]; //keep building the term
-				}
-			} //end paren check
-			
-			else { //if the parens arn't closed
-				termBuild += string[i]; //keep building the term
-			}
-			
-			parenStacks = toMachine.checkParenthesis(parenStacks, string[i]); //keep paren stack up to date
-		} //end splice loop
-		slicedTerms.push(termBuild);
-		
-		return slicedTerms;
+		return toMachine.split(string, '+', '-');
 	} //end sliceAtTerms
 
 	//---------------------------------------------------------------------------------------------constructor

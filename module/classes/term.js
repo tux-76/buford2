@@ -10,55 +10,34 @@ export default class Term {
 	//========================================================================================================================
 	
 	#sliceAtFactors(string) { //splice the term into it's factors
-		let parenStacks = [0, 0, 0]; //create stacks for [parenthesis '()', bracket '[]', brace '{}']
+		let symbolsAdded = '';
+		let splitStr = string.split('');
+		let lastType = 'none';
+		let parenStacks = 0;
 
-		let factors = []; //array for factors
-		let factorBuild = ""; //builder for factors
-		for (let i=0; i<string.length; i++) { //loop through term string
-			if (parenStacks[0] === 0 && parenStacks[1] === 0 && parenStacks[2] === 0) { //if there are no open parenthesis
-				if ( //if implied multiplication with parenthesis
-					constants.parenthesis.includes(string[i]) && //the current character is parenthesis
-					!(constants.operators.includes(string[i-1])) && //there is no operator in front of the paren
-					!(factorBuild === "") //there is a term to be pushed
-				) { 
-					factors.push(factorBuild);
-					factorBuild = "(";
-				} else if (string[i] === '*') { //if its a multiplication
-					factors.push(factorBuild);
-					factorBuild = "";
-				} else if (string[i] === '/') { //if it's division
-					factors.push(factorBuild);
-					factorBuild = "/"; //converting division into multiplication
-				} else if (string[i] === '-') { //if theres a subtraction
-					factors.push(-1);
-				} else if (constants.variables.includes(string[i]) && !(constants.operators.includes(string[i-1]))) { //if the char is a variable and theres no operator in front
-					if (factorBuild !== "") { //if the build isn't empty
-						factors.push(factorBuild);
-					}
-					factorBuild = string[i];
-				} else if (constants.numbers.includes(string[i])) { //if it's a number
-					if (constants.variables.includes(factorBuild)) { //if the term builder is a variable
-						factors.push(factorBuild); //push it because the next will be a new term
-						factorBuild = "";
-					}
-					factorBuild += string[i];
-				} else { //if its none of those
-					factorBuild += string[i];
-				}
-				
-			}//paren check
+		splitStr.forEach((char, i) => {
+			let thisType = 'none';
+			if (constants.variables.includes(char)) thisType = char;
+			else if (constants.numbers.includes(char)) thisType = 'num';
+			else if (constants.parenthesis.slice(0,3).includes(char)) thisType = 'open paren';
+			else if (constants.parenthesis.slice(3,6).includes(char)) thisType = 'close paren';
+			else thisType = 'none';
 
-			else { //if parenthesis is open
-				factorBuild += string[i];
+			if (
+				lastType !== thisType && 
+				!['none', 'close paren'].includes(thisType) && 
+				!['none', 'open paren'].includes(lastType) &&
+				parenStacks < 1
+			) {
+				symbolsAdded += '*';
 			}
-		
-			parenStacks = toMachine.checkParenthesis(parenStacks, string[i]); //keep the paren stack up to date
-		} //end term loop
-		if (factorBuild !== "") { //if it there are leftovers
-			factors.push(factorBuild);
-		}
-		
-		return factors;
+
+			symbolsAdded += char;
+			lastType = thisType;
+
+			if (constants.parenthesis.includes(char)) parenStacks += (constants.parenthesis.slice(0, 3).includes(char)) ? 1 : -1
+		});
+		return toMachine.split(symbolsAdded, '*', '/')
 	}//sliceAtFactors
 
 	//-------------------------------------------------------------------------------------------constructor
@@ -67,6 +46,7 @@ export default class Term {
 	#stringConstuctor(mathString) {
 		//main
 		let slices = this.#sliceAtFactors(mathString);
+		console.log(slices);
 		slices.forEach(factor => { //for all the factors of the term:
 			let factorType = toMachine.interpretMathString(factor);
 

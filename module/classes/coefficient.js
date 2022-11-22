@@ -9,23 +9,8 @@ export default class Coefficient {
 	//========================================================================================================================
 	
 	#sliceAtExponent(string) {
-		let base = ""
-		let exponent = ""
-		let parenStacks = [0, 0, 0]
-
-		let i = 0;
-		while (!(string[i] == "^" && (parenStacks[0] == 0 && parenStacks[1] == 0 && parenStacks[2] == 0)) && i < string.length) { // loop to ^ sign
-			base += string[i]
-			parenStacks = toMachine.checkParenthesis(parenStacks, string[i])
-			i++;
-		}
-		i++;
-		while(i < string.length) { // set exponent to everything after ^ sign
-			exponent += string[i];
-			i++;
-		}
-
-		return [base, exponent];
+		let split = toMachine.split(string, '^', '#');
+		return [split[0], split.slice(1, -1).join('^')];
 	} //sliceAtExponents
 
 	base = null;
@@ -35,6 +20,7 @@ export default class Coefficient {
 	#stringConstuctor(coefStr) {
 		//slice input to base and exponent
 		let sliced = this.#sliceAtExponent(coefStr);
+		console.log("e", sliced)
 		let baseStr = sliced[0];
 		let exponentStr = sliced[1];
 		

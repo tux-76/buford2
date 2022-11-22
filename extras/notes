@@ -9,5 +9,6 @@
 
 
 ==================================================================Long term
-~ bu2_Term => simplify => "simpCoef.exponent += coef.exponent;"
+- bu2_Term => simplify => "simpCoef.exponent += coef.exponent;"
     - Exponents will not always be numerical. Must be updated with support for un-numerical exponents
+- NO SQUARE ROOT OR ANYTHING

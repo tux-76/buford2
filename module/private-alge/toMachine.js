@@ -1,28 +1,25 @@
 import * as constants from "../constants.js";
 
-//--------------------------------------------------------------------------------check parenthesis
-export function checkParenthesis(parenStacks, char) {
-	if (char === '(') {
-		parenStacks[0] += 1;
-	}
-	else if (char === '[') {
-		parenStacks[1] += 1;
-	}
-	else if (char === '{') {
-		parenStacks[2] += 1;
-	}
-	
-	//check for closing parens
-	else if (char === ')') {
-		parenStacks[0] -= 1;
-	}
-	else if (char === ']') {
-		parenStacks[1] -= 1;
-	}
-	else if (char === '}') {
-		parenStacks[2] -= 1;
-	}
-	return parenStacks
+export function split(string, exclusiveChar, inclusiveChar) {
+	let negates = ['^', '#', '*', '/'];
+
+	let parenStack = 0;
+	let builder = "";
+	let output = [];
+
+	let splitArr = string.split("");
+	splitArr.forEach((char, i) => {
+		// exclusive and inclusive chars
+		if ([exclusiveChar, inclusiveChar].includes(char) && parenStack === 0 && !negates.includes(splitArr[i-1])) {
+			output.push(builder); builder = (char === exclusiveChar) ? "" : inclusiveChar;
+		} else {
+			// open and close parens
+			if (constants.parenthesis.includes(char)) parenStack += (constants.parenthesis.indexOf(char) < 3) ? 1 : -1;
+
+			builder += char;
+		}
+	});
+	return output.concat([builder]).filter(e => e !== '');
 }
 
 //-------------------------------------------------------------------------------identify string
