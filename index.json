@@ -32,6 +32,9 @@
         }
     },
     "factor": {
+        "type":"dir",
+        "name": "Factor",
+
         "factor":{
             "type":"func",
 
