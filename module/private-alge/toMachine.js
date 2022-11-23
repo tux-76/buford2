@@ -40,6 +40,8 @@ export function interpretMathString(mathString) {
 		type.type = "var";
 	} else if (constants.parenthesis.includes(mathString[0]) && constants.parenthesis.includes(mathString[mathString.length-1])) {
 		type.type = "exp";
+	} else if (mathString === '-') {
+		type.type = "neg"
 	} else {
 		type.type = "non";
 	}

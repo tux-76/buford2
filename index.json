@@ -1,0 +1,68 @@
+
+{
+    "allInTypes": ["str", "char", "num", "bool", "a-num"],
+
+    "alge": {
+        "type":"dir",
+        "name": "Algebra",
+
+        "simplifyExpression":{
+            "type":"func",
+
+            "name":"Simplify Expression",
+            "desc":"Will undistribute and perform available operations on the input.",
+            "inputs": ["Expression"],
+            "inTypes":["str"]
+        },
+        "doubleSidedSolve":{
+            "type":"func",
+
+            "name":"Solve Double Sided Equation",
+            "desc":"Will simplify and distill the given variable from the left side of the equation.",
+            "inputs":["Equation", "Variable to solve for"],
+            "inTypes":["str", "char"]
+        },
+        "substituteVariable":{
+            "type":"func",
+
+            "name":"Substitute Number For Variable",
+            "desc":"Will replace (substitute) all instances of the given variable with the given number and simplify the output.",
+            "inputs":["Expression", "Variable to substitute", "Substitute number"],
+            "inTypes":["str", "char", "num"]
+        }
+    },
+    "factor": {
+        "factor":{
+            "type":"func",
+
+            "name":"Factor number",
+            "desc":"Will get integer factors of number.",
+            "inputs":["Integer to factor", "Show co-factors", "List negatives"],
+            "inTypes":["num", "bool", "bool"]
+        },
+        "GCF":{
+            "type":"func",
+
+            "name":"Get GCF",
+            "desc":"Will get the greatest common factor of multiple numbers.",
+            "inputs":["Integers"],
+            "inTypes":["a-num"]
+        },
+        "primeFactor":{
+            "type":"func",
+
+            "name":"Get Prime Factorization",
+            "desc":"Will return the prime factors of an integer",
+            "inputs":["Integer"],
+            "inTypes":["num"]
+        },
+        "isPrime":{
+            "type":"func",
+
+            "name":"Is Prime",
+            "desc":"Will determine if an integer is prime or composite.",
+            "inputs":["Integer"],
+            "inTypes":["num"]
+        }
+    }
+}

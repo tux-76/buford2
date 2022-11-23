@@ -46,7 +46,6 @@ export default class Term {
 	#stringConstuctor(mathString) {
 		//main
 		let slices = this.#sliceAtFactors(mathString);
-		console.log(slices);
 		slices.forEach(factor => { //for all the factors of the term:
 			let factorType = toMachine.interpretMathString(factor);
 
@@ -87,11 +86,10 @@ export default class Term {
 
 	//------------------------------------------------------------------------------------------------------is distributable
 	get isDistributable() {
-		let flag = false;
 		this.coefficients.forEach(coef => {
-			if (coef.base instanceof Expression) flag = true;
+			if (coef.base instanceof Expression && coef.exponent === 1) return 1;
 		});
-		return flag;
+		return 0;
 	}
 
 	//---------------------------------------------------------------------------------------------compare terms
@@ -131,8 +129,8 @@ export default class Term {
 
 	//-------------------------------------------------------------------------------------------------------simplify
 	simplify() {
+		this.coefficients.forEach(e => e.simplify());
 		let coefs = this.coefficients.filter(coef => {
-			coef.simplify();
 			if (coef.isNumerical()) {
 				this.constant *= Math.pow(coef.base, coef.exponent);
 				return false;

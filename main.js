@@ -1,18 +1,22 @@
-import * as classes from "./module/classes.js";
+import {Variable, Coefficient, Term, Expression, Equation} from "./module/classes.js";
 import * as constants from "./module/constants.js";
 import { debug, toString } from "./module/private-alge.js"
 
-import * as alge from "./module/public/alge.js";
+import * as algeFunc from "./module/public/alge.js";
 import * as factor from "./module/public/factor.js"
 
 let Buford2 = {alge:{}};
 Buford2.factor = factor;
 
-/*
-	Function modes (arguement 1):
-	 ~ "simplify expression"
-	 ~ "double sided solve"
-*/
+function algeFunctionInputs(mode, string, ...otherArgs) {
+	if (mode === "simplifyExpression") 
+		return algeFunc[mode](new Expression(string));
+	else if (mode === "doubleSidedSolve") 
+		return algeFunc[mode](new Equation(string), constants.variables.indexOf(otherArgs[0]));
+	else if (mode === "substituteVariable") 
+		return algeFunc[mode](new Expression(string), constants.variables.indexOf(otherArgs[0]), otherArgs[1]);
+}
+
 function algebraFunctionWrap(mode, ...args) {
 	debug.group(`Buford2`, `"${args[0]}"`, 0);
 	debug.log("Mode", mode);
@@ -21,21 +25,19 @@ function algebraFunctionWrap(mode, ...args) {
 	//format string
 	let string = args[0];
 	string = string.split(" ").join("");
+	string = string.split("--").join("+")
 	debug.log("Format String", `"${string}"`);
 	
-
-	//functions
-	if (mode === "simplify expression") retr = alge.simplifyExpression(new classes.Expression(string));
-	else if (mode === "double sided solve") retr = alge.doubleSidedSolve(new classes.Equation(string), constants.variables.indexOf(args[1]));
-
+	retr = algeFunctionInputs(mode, string, ...args.slice(1));
 
 	debug.groupEnd("Buford2", retr);
 	return toString(retr, "no parenthesis");
 }
 
-
-Buford2.alge.simplifyExpression = (...args) => algebraFunctionWrap("simplify expression", ...args);
-Buford2.alge.doubleSidedSolve = (...args) => algebraFunctionWrap("double sided solve", ...args);
+// add all functions as wrapped
+for (const key in algeFunc) {
+	Buford2.alge[key] = (...args) => algebraFunctionWrap(key, ...args);
+}
 
 export default Buford2;
 console.log("Buford2 module exported.");
