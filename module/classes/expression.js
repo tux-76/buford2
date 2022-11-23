@@ -45,6 +45,11 @@ export default class Expression extends Array {
 		return hasVar;
 	}
 
+	//-------------------------------------------------------------------------copy
+	copy() {
+		return new Expression(toString(this).slice(1, -1));
+	}
+
 	//=======================================================================================================
 	//----------------------------------------------------------------------------------------------------modifiers
 	//=======================================================================================================
@@ -56,9 +61,8 @@ export default class Expression extends Array {
 
 	//---------------------------------------------------------------------------------------------simplify
 	simplify() {
-		this.forEach(term => {
-			term.simplify();
-		});
+		this.forEach(e => e.simplify());
+
 		let simplified = [];
 		this.forEach(term => {
 			let matchFound = false;
@@ -84,13 +88,14 @@ export default class Expression extends Array {
 	//-----------------------------------------------------------------------------------------------------distribute
 	distribute(termIndex, recursive=false) {
 		if (!this[termIndex].isDistributable) return 1;
-		let term = this[termIndex]; this.splice(termIndex, 1);
+		let term = this[termIndex];
 
 		//get the index of the expression within the term
 		let expressionIndex = null;
 		for (let i = 0; i < term.coefficients.length && expressionIndex === null; i++) {
-			if (term.coefficients[i].base instanceof Expression) expressionIndex = i;
+			if (term.coefficients[i].base instanceof Expression && term.coefficients[i].exponent === 1) expressionIndex = i;
 		}
+		// flag if exponent of expression is not 1
 		let expression = term.coefficients[expressionIndex].base; term.coefficients.splice(expressionIndex, 1);
 
 		//start distributing
@@ -109,8 +114,10 @@ export default class Expression extends Array {
 			});
 		}
 
+		this.splice(termIndex, 1);
 		this.simplify();
 		this.bufordSort();
+
 		return 0;
 	}
 
@@ -119,13 +126,17 @@ export default class Expression extends Array {
 		this.slice().forEach(term => {
 			this.distribute(this.indexOf(term), true);
 		});
+		debug.log("Distribute all", this);
 	}
 
 	//----------------------------------------------------------------------------------------------------compress
 	compress() {
+		debug.group("Compress expression", this);
+
 		this.distributeAll();
-		this.bufordSort();
 		this.simplify();
+
+		debug.groupEnd("Compress expression", this);
 	}
 
 	//------------------------------------------------------------------------------------------------------undistribute
@@ -187,19 +198,15 @@ export default class Expression extends Array {
 			bu2_sort.sort(term);
 		});
 		newTerm.coefficients.push(new Coefficient(new Expression(...terms), 1));
-		console.log(toString(newTerm));
 		debug.log("New expression", newTerm.coefficients[newTerm.coefficients.length-1]);
 
 
 		// make change
 		termIndexes.forEach(i => this.splice(i, 1)); // remove terms
-		console.log(toString(this), toString(newTerm));
 		this.push(newTerm);
-		console.log(toString(this))
 
 		
 		this.bufordSort();
-		console.log(toString(this))
 		debug.groupEnd("Undistribute", this);
 		return 0;
 	}

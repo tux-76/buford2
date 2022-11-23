@@ -1,4 +1,4 @@
-import { Variable, Expression } from "../classes.js";
+import { Variable, Term, Expression } from "../classes.js";
 import * as toMachine from "../private-alge/toMachine.js";
 import toString from "../private-alge/toString.js";
 
@@ -10,7 +10,7 @@ export default class Coefficient {
 	
 	#sliceAtExponent(string) {
 		let split = toMachine.split(string, '^', '#');
-		return [split[0], split.slice(1, -1).join('^')];
+		return [split[0], split.slice(1).join('^')];
 	} //sliceAtExponents
 
 	base = null;
@@ -20,7 +20,6 @@ export default class Coefficient {
 	#stringConstuctor(coefStr) {
 		//slice input to base and exponent
 		let sliced = this.#sliceAtExponent(coefStr);
-		console.log("e", sliced)
 		let baseStr = sliced[0];
 		let exponentStr = sliced[1];
 		
@@ -93,6 +92,14 @@ export default class Coefficient {
 
 	//----------------------------------------------------------------simplify
 	simplify() {
+		// check if unnecessary expression is present and remove if so
+		if (this.base instanceof Expression) if (this.base.length === 1) {
+			let term = this.base[0];
+			if (term.coefficients.length === 0) {
+				this.base = term.constant;
+			}
+		}
+
 		if (isNaN(this.base) && !(this.base instanceof Variable)) this.base.simplify();
 		if (isNaN(this.exponent) && !(this.base instanceof Variable)) this.exponent.simplify();
 	}
