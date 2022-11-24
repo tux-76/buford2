@@ -5,8 +5,8 @@ import { debug, toString } from "./module/private-alge.js"
 import * as algeFunc from "./module/public/alge.js";
 import * as factor from "./module/public/factor.js"
 
-export let alge = {};
-export let factor = factor;
+let Buford2 = {alge:{}};
+Buford2.factor = factor;
 
 function algeFunctionInputs(mode, string, ...otherArgs) {
 	if (mode === "simplifyExpression") 
@@ -39,6 +39,7 @@ for (const key in algeFunc) {
 	Buford2.alge[key] = (...args) => algebraFunctionWrap(key, ...args);
 }
 
+export default Buford2;
 console.log("Buford2 module exported.");
 
 /*

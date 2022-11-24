@@ -8,7 +8,6 @@
 
         "simplifyExpression":{
             "type":"func",
-            "id":0,
 
             "name":"Simplify Expression",
             "desc":"Will undistribute and perform available operations on the input.",
