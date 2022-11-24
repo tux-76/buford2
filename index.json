@@ -8,6 +8,7 @@
 
         "simplifyExpression":{
             "type":"func",
+            "id":0,
 
             "name":"Simplify Expression",
             "desc":"Will undistribute and perform available operations on the input.",
@@ -16,6 +17,7 @@
         },
         "doubleSidedSolve":{
             "type":"func",
+            "id":1,
 
             "name":"Solve Double Sided Equation",
             "desc":"Will simplify and distill the given variable from the left side of the equation.",
@@ -24,6 +26,7 @@
         },
         "substituteVariable":{
             "type":"func",
+            "id":2,
 
             "name":"Substitute Number For Variable",
             "desc":"Will replace (substitute) all instances of the given variable with the given number and simplify the output.",
@@ -37,6 +40,7 @@
 
         "factor":{
             "type":"func",
+            "id":3,
 
             "name":"Factor number",
             "desc":"Will get integer factors of number.",
@@ -45,6 +49,7 @@
         },
         "GCF":{
             "type":"func",
+            "id":4,
 
             "name":"Get GCF",
             "desc":"Will get the greatest common factor of multiple numbers.",
@@ -53,6 +58,7 @@
         },
         "primeFactor":{
             "type":"func",
+            "id":5,
 
             "name":"Get Prime Factorization",
             "desc":"Will return the prime factors of an integer",
@@ -61,6 +67,7 @@
         },
         "isPrime":{
             "type":"func",
+            "id":6,
 
             "name":"Is Prime",
             "desc":"Will determine if an integer is prime or composite.",
