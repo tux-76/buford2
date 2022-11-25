@@ -1,3 +1,9 @@
+/*
+	Buford2 main file.
+	For an easy to use gui for each of the public functions, head to https://tux-76.github.io/buford2
+*/
+
+
 import {Variable, Coefficient, Term, Expression, Equation} from "./module/classes.js";
 import * as constants from "./module/constants.js";
 import { debug, toString } from "./module/private-alge.js"
@@ -54,4 +60,5 @@ Timeline:
 	-SUN 09:34 09/25/2022: First operational version of "simplify expression" mode!
 	-MON 19:36 09/26/2022: We are now caught up to the first version of Buford in functionality! Yet this time with a long road of improvement ahead :)
 	-THU 19:52 10/06/2022: Attempt to change the structure to a more modular based approach. A little bit difficult because I don't know how to keep all the ties to other functions I've created.
+	-FRI 11:55 11/25/2022: Create rough dynamic site for Buford2 (Dynamic in updating with updates to "index.json"). Looking really classy at https://tux-76.github.io/buford2
 */
