@@ -18,6 +18,8 @@ export default class Coefficient {
 
 	//---------------------------------------------------------------constructor
 	#stringConstuctor(coefStr) {
+		// console.log("Coef string", coefStr);
+
 		//slice input to base and exponent
 		let sliced = this.#sliceAtExponent(coefStr);
 		let baseStr = sliced[0];
@@ -47,6 +49,8 @@ export default class Coefficient {
 			this.base = new Variable(baseStr);
 		} else if (baseType.type === "exp") {
 			this.base = new Expression(baseStr.slice(1, baseStr.length-1));
+		} else if (baseType.type === "neg") {
+			this.base = -1;
 		} else console.error(`Coefficient base type "${baseType.type}" does not have a handler.`);
 	}
 	#manualConstructor(base, exponent) {

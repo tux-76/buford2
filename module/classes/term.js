@@ -10,6 +10,8 @@ export default class Term {
 	//========================================================================================================================
 	
 	#sliceAtFactors(string) { //splice the term into it's factors
+		// console.log("Term string", string);
+
 		let symbolsAdded = '';
 		let splitStr = string.split('');
 		let lastType = 'none';
@@ -86,10 +88,12 @@ export default class Term {
 
 	//------------------------------------------------------------------------------------------------------is distributable
 	get isDistributable() {
+		let returnBool = 0;
 		this.coefficients.forEach(coef => {
-			if (coef.base instanceof Expression && coef.exponent === 1) return 1;
+			console.log("coef", coef.base, coef.exponent, coef.base instanceof Expression, coef.exponent === 1, coef.base instanceof Expression && coef.exponent === 1)
+			if (coef.base instanceof Expression && coef.exponent === 1) returnBool = 1;
 		});
-		return 0;
+		return returnBool;
 	}
 
 	//---------------------------------------------------------------------------------------------compare terms

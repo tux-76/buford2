@@ -14,6 +14,8 @@ export default class Expression extends Array {
 
 	//---------------------------------------------------------------------------------------------constructor
 	#stringConstructor(string) {
+		// console.log("Expression string", string);
+
 		let slices = this.#sliceAtTerms(string);
 
 		for (let i = 0; i<slices.length; i++) {
@@ -87,6 +89,7 @@ export default class Expression extends Array {
 
 	//-----------------------------------------------------------------------------------------------------distribute
 	distribute(termIndex, recursive=false) {
+		console.log(this[termIndex], this[termIndex].isDistributable)
 		if (!this[termIndex].isDistributable) return 1;
 		let term = this[termIndex];
 
@@ -124,7 +127,7 @@ export default class Expression extends Array {
 	//-----------------------------------------------------------------------------------------------------distribute all
 	distributeAll(recursive=true) {
 		this.slice().forEach(term => {
-			this.distribute(this.indexOf(term), true);
+			this.distribute(this.indexOf(term), recursive);
 		});
 		debug.log("Distribute all", this);
 	}
