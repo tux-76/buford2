@@ -37,7 +37,7 @@ function algebraFunctionWrap(mode, ...args) {
 	retr = algeFunctionInputs(mode, string, ...args.slice(1));
 
 	debug.groupEnd("Buford2", retr);
-	return toString(retr, "no parenthesis");
+	return toString.basic(retr, "no parenthesis");
 }
 
 // add all functions as wrapped

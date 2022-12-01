@@ -49,7 +49,7 @@ export default class Expression extends Array {
 
 	//-------------------------------------------------------------------------copy
 	copy() {
-		return new Expression(toString(this).slice(1, -1));
+		return new Expression(toString.basic(this).slice(1, -1));
 	}
 
 	//=======================================================================================================

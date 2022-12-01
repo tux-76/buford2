@@ -98,12 +98,12 @@ export default class Term {
 
 	//---------------------------------------------------------------------------------------------compare terms
 	compareTerms(term) {
-		return (toString(this, "no constant") == toString(term, "no constant"));
+		return (toString.basic(this, "no constant") == toString.basic(term, "no constant"));
 	}
 
 	//------------------------------------------------------------------------------------------------copy
 	copy() {
-		return new Term(toString(this));
+		return new Term(toString.basic(this));
 	}
 
 	
@@ -146,7 +146,7 @@ export default class Term {
 			let matchFound = false;
 			for (let sci = 0; sci < simplified.length && !matchFound; sci++) {
 				let simpCoef = simplified[sci];
-				if (toString(coef.base) === toString(simpCoef.base)) {
+				if (toString.basic(coef.base) === toString.basic(simpCoef.base)) {
 					simpCoef.exponent += coef.exponent;
 					matchFound = true;
 				}

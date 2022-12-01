@@ -1,6 +1,6 @@
 import { Variable, Term, Expression } from "../classes.js";
 import * as toMachine from "../private-alge/toMachine.js";
-import toString from "../private-alge/toString.js";
+import * as toString from "../private-alge/toString.js";
 
 
 export default class Coefficient {
@@ -83,7 +83,7 @@ export default class Coefficient {
 
 	//--------------------------------------------------------------copy
 	copy() {
-		return new Coefficient(toString(this));
+		return new Coefficient(toString.basic(this));
 	}
 
 	//---------------------------------------------------------------is numerical

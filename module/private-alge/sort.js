@@ -1,6 +1,6 @@
 import * as constants from "../constants.js";
 import * as classes from "../classes.js";
-import toString from "./toString.js";
+import * as toString from "./toString.js";
 
 //------------------------------------------------------------sort
 export function sort(object) {
@@ -23,7 +23,7 @@ export function sortArrayObject(array) { //sorts array objects (term's coefficen
 	array.forEach(e => sort(e)); //sort all values within this object
 	
 	//create string array with values corresponding to the real ones
-	let correspondingStrArr = [...array.map(e => toString(e))];
+	let correspondingStrArr = [...array.map(e => toString.basic(e))];
 
 	//create and organize sortedStrArr
 	let sortedStrArr = correspondingStrArr.slice().sort();
@@ -34,5 +34,5 @@ export function sortArrayObject(array) { //sorts array objects (term's coefficen
 }
 
 export function findObject(needle, haystack=[]) {
-	return haystack.map(e => toString(e)).indexOf(toString(needle));
+	return haystack.map(e => toString.basic(e)).indexOf(toString.basic(needle));
 }
