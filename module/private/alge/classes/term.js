@@ -1,8 +1,8 @@
 
-import * as constants from "../constants.js";
-import * as toMachine from "../private-alge/toMachine.js";
-import { toString, sort as bu2_sort } from "../private-alge.js";
-import {Coefficient, Expression} from "../classes.js";
+import * as constants from "../../constants.js";
+import * as toMachine from "../toMachine.js";
+import { toString, sort as bu2_sort } from "../../alge-func.js";
+import {Coefficient, Expression} from "../../alge-classes.js";
 
 export default class Term {
 	//========================================================================================================================

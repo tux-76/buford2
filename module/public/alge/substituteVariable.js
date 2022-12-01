@@ -1,4 +1,4 @@
-import { Expression } from "../../classes.js";
+import { Expression } from "../../private/alge-classes.js";
 
 function subCoef() {
 

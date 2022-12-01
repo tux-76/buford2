@@ -4,9 +4,9 @@
 */
 
 
-import {Variable, Coefficient, Term, Expression, Equation} from "./module/classes.js";
-import * as constants from "./module/constants.js";
-import { debug, toString } from "./module/private-alge.js"
+import {Variable, Coefficient, Term, Expression, Equation} from "./module/private/alge-classes.js";
+import * as constants from "./module/private/constants.js";
+import { debug, toString } from "./module/private/alge-func.js"
 
 import * as algeFunc from "./module/public/alge.js";
 import * as factor from "./module/public/factor.js"

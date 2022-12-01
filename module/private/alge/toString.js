@@ -1,4 +1,4 @@
-import * as classes from "../classes.js";
+import * as classes from "../alge-classes.js";
 import * as constants from "../constants.js";
 
 /*----------------------------------------------------------to string
@@ -39,6 +39,6 @@ export function basic(value, mode="normal") {
 	else console.error(`toString did not recognize value:`, value);
 }
 
-export function pretty() {
+export function pretty(value) {
 	
 }

@@ -1,6 +1,6 @@
-import { Variable, Term, Expression } from "../classes.js";
-import * as toMachine from "../private-alge/toMachine.js";
-import * as toString from "../private-alge/toString.js";
+import { Variable, Term, Expression } from "../../alge-classes.js";
+import * as toMachine from "../toMachine.js";
+import * as toString from "../toString.js";
 
 
 export default class Coefficient {

@@ -1,6 +1,6 @@
-import { debug, sort as bu2_sort, toString } from "../../private-alge.js";
-import { Term, Expression } from "../../classes.js";
-import * as constants from "../../constants.js"
+import { debug, sort as bu2_sort, toString } from "../../private/alge-func.js";
+import { Term, Expression } from "../../private/alge-classes.js";
+import * as constants from "../../private/constants.js"
 
 
 export default function doubleSidedSolve(equation, variable) {
