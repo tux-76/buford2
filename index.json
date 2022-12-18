@@ -31,6 +31,7 @@
             "inTypes":["str", "char", "num"]
         }
     },
+
     "factor": {
         "type":"dir",
         "name": "Factor",
@@ -66,6 +67,18 @@
             "desc":"Will determine if an integer is prime or composite.",
             "inputs":["Integer"],
             "inTypes":["num"]
+        }
+    },
+
+    "geometry":{
+        "type":"dir",
+        "name": "Geometry",
+
+        "triangle": {
+            "type":"dir",
+            "name":"Triangle"
+
+            
         }
     }
 }

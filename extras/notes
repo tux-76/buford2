@@ -1,14 +1,13 @@
 ==================================================================General
-- Should sorting be more regular in algorithm?
-
 
 ==================================================================Short term
 - no dividing in output string, [4a/b] stays as [4a*b^-1]
-- negative exponents cannot be inputted
-- COPY DOES NOT WORK BECAUSE OF THE ABOVE!!! IMPORTANT FIX!!!!
 
 
 ==================================================================Long term
 - bu2_Term => simplify => "simpCoef.exponent += coef.exponent;"
     - Exponents will not always be numerical. Must be updated with support for un-numerical exponents
 - NO SQUARE ROOT OR ANYTHING
+
+==================================================================Failed Tests
+- doubleSidedSolve("28/r=4", "r") => 'r^-1 = 0.14285714285714285' EXPECTED: 'r = 7'
