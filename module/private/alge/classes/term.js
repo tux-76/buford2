@@ -90,7 +90,6 @@ export default class Term {
 	get isDistributable() {
 		let returnBool = 0;
 		this.coefficients.forEach(coef => {
-			console.log("coef", coef.base, coef.exponent, coef.base instanceof Expression, coef.exponent === 1, coef.base instanceof Expression && coef.exponent === 1)
 			if (coef.base instanceof Expression && coef.exponent === 1) returnBool = 1;
 		});
 		return returnBool;

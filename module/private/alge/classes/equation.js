@@ -39,7 +39,9 @@ export default class Equation {
 
 	constructor(mathString) {
 		let sliced = this.#sliceAtExpressions(mathString);
-		if (sliced[0].length > 2) console.error("Equation cannot have more than two expressions! (Try system of equations!)");
+		let equation = sliced[0];
+		if (equation.length > 2) console.error("Equation cannot have more than two expressions! (Try system of equations!)");
+		else if (equation.length < 2) console.error("Equation must have two sides! (=, <, >)");
 
 		this.left = new Expression(sliced[0][0]);
 		this.right = new Expression(sliced[0][1]);

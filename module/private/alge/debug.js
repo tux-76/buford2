@@ -14,7 +14,7 @@ export function log(title, output) {
 
 		else if (typeof output === "string") console.log(`%c${title} %c=> %c${output}`, logColor, arrowColorOut, normalColor);
 
-		else if (output.constructor === Array) console.log(`%c${title} %c=> %c${output.map(e => toString.basic(e)).toString.basic()}`, logColor, arrowColorOut, normalColor);
+		else if (output.constructor === Array) console.log(`%c${title} %c=> %c${output.map(e => toString.basic(e)).toString()}`, logColor, arrowColorOut, normalColor);
 
 		else console.log(`%c${title} %c=> %c${toString.basic(output, "no parenthesis")}`, logColor, arrowColorOut, normalColor);
 	}

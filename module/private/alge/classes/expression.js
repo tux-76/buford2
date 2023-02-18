@@ -89,7 +89,8 @@ export default class Expression extends Array {
 
 	//-----------------------------------------------------------------------------------------------------distribute
 	distribute(termIndex, recursive=false) {
-		console.log(this[termIndex], this[termIndex].isDistributable)
+		console.log("\t start", termIndex)
+		console.log("new", this.copy(), this.indexOf(term))
 		if (!this[termIndex].isDistributable) return 1;
 		let term = this[termIndex];
 
@@ -113,6 +114,7 @@ export default class Expression extends Array {
 		//recurse if set to
 		if (recursive) {
 			newTerms.forEach(newTerm => {
+				console.log("\t\tnew term", toString.basic(newTerm), this.indexOf(newTerm))
 				if (newTerm.isDistributable) this.distribute(this.indexOf(newTerm), true);
 			});
 		}
@@ -136,6 +138,7 @@ export default class Expression extends Array {
 	compress() {
 		debug.group("Compress expression", this);
 
+		console.log("original", this.copy())
 		this.distributeAll();
 		this.simplify();
 
