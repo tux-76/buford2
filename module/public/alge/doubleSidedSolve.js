@@ -19,6 +19,7 @@ export default function doubleSidedSolve(equation, variable) {
         // start the term phase
         // moves no variable terms to the right, variable terms to the left
         termPhase();
+        debug.error("Double Sided Solve", "sus")
 
         // is there only one term that contains the variable?
         if (equation.left.length === 1) {
@@ -83,24 +84,33 @@ export default function doubleSidedSolve(equation, variable) {
     /*
         Solve For Multiple Terms
         DESC: Will attempt to factor a single variable out of multiple terms. EX: ax + bx = c --> x(a + b) = c --> x = c / (a + b)
-        
+        STEPS:
+            - Undistribute the variable side
+            - Create a term without the factored expression and isolate the expression
+            - Make sure:
+                1) The term that was factored out has a variable in it
+                2) The factored expression does NOT have a variable in it
+                EX: x(3+a): Good
+            - If true: Move to factor phase
     */
     function solveForMultipleTerms() {
         debug.log("Solve for multiple terms", equation.left);
-        // attempt to undistribute
-        if (equation.left.undistribute() !== 1) {
-            // set up variables
+        // attempt to undistribute (0 = Undistributed, 1 = Not possible)
+        if (equation.left.undistribute() === 0) {
+            // The target is the term that contains the un-distributed expression
             let target = equation.left[0];
-            let receivers;
+            // The factor expression is the expression in the target
+            let factorExpression;
+            // Create a new term without the expression coefficient
             let factor = new Term(target.constant, target.coefficients.filter(coef => {
                 if (coef.base instanceof Expression) {
-                    receivers = coef.base;
+                    factorExpression = coef.base;
                     return 0;
                 } else return 1;
             }));
 
             // check if variable is factored out
-            if (factor.hasVariable(variable) && !receivers.hasVariable(variable)) {
+            if (factor.hasVariable(variable) && !factorExpression.hasVariable(variable)) {
                 debug.log("Variable sucessfully factored(undistributed) into single term");
                 factorPhase();
             }
@@ -109,17 +119,31 @@ export default function doubleSidedSolve(equation, variable) {
     //===========================================================================================
     //------------------------------------------------------------------------------------factor phase
     //===========================================================================================
+    /*
+        Factor Phase
+        WHEN: There is only one term with a variable in it (in equation.left)
+        DESC: Will move all coefficients to the other side of the equation, as well as the constant (number).
+        JOBS:
+            - Divide all terms (right and left) by the constant of the target (variabled term)
+
+    */
     function factorPhase() {
         debug.group("Factor Phase", equation);
+        
+        // Do checks and give errors
+        if (equation.left.length !== 1) {
+            throw new Error(`Factor Phase: Left side of equation must only be 1 term! ${equation.left.length} were given!`)
+        }
 
+        // The target term, the one we will isolate the variable in 
         let target = equation.left[0];
 
-        //-------------------------------------------------move constant
+        // Divide both sides by the constant of the target
         equation.right.forEach(rightTerm => rightTerm.constant /= target.constant);
         target.constant = 1;
         debug.log("Move Target's Constant", equation);
 
-        //--------------------------------------------move other variables
+        // Remove the coefs without the target variable in the target term
         let removedCoefs = [];
         target.coefficients = target.coefficients.filter((coef) => { // remove extra coefs from term and add to array
             if (coef.hasVariable(variable) === false) {
@@ -127,7 +151,8 @@ export default function doubleSidedSolve(equation, variable) {
                 return false;
             } else return true;
         });
-        equation.right.forEach((term) => { // add the extras to the other side
+        // Add the coefficients that were removed to each term on the other side
+        equation.right.forEach((term) => { 
             term.coefficients = term.coefficients.concat(removedCoefs.map(coef => {
                 let newCoef = coef.copy();
                 newCoef.exponent *= -1;

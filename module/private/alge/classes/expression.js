@@ -217,7 +217,8 @@ export default class Expression extends Array {
 		})
 		
 		// Add new total undistributed term to expression
-		
+		this.push(newTerm)
+
 		this.bufordSort();
 		debug.groupEnd("Undistribute", this);
 		return 0;

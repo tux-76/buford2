@@ -1,5 +1,6 @@
 import * as toString from "./toString.js";
 
+const errorColor = "color: #bb0293"
 const titleColor = "color: #c63915";
 const logColor = "color: #a3642a";
 const arrowColorOut = "color: #1da588";
@@ -30,5 +31,19 @@ export function groupEnd(title, output) {
 	if (doDebug) {
 		console.groupEnd();
 		log(title, output);
+	}
+}
+
+export function error(title, output) {
+	if (doDebug) {
+		if (doDebug) {
+			if (output === undefined) console.error(`%c! ${title} !`, errorColor);
+	
+			else if (typeof output === "string") console.error(`%c${title} %c=> %c${output}`, errorColor, arrowColorOut, normalColor);
+	
+			else if (output.constructor === Array) console.error(`%c${title} %c=> %c${output.map(e => toString.basic(e)).toString()}`, errorColor, arrowColorOut, normalColor);
+	
+			else console.error(`%c${title} %c=> %c${toString.basic(output, "no parenthesis")}`, errorColor, arrowColorOut, normalColor);
+		}
 	}
 }
