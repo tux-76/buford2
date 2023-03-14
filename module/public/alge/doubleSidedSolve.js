@@ -6,11 +6,50 @@ import * as constants from "../../private/constants.js"
 export default function doubleSidedSolve(equation, variable) {
 	debug.group("Double Sided Solve", equation);
 
+
+    //===========================================================================================
+    //-----------------------------------------------------------------------------------------main
+    //===========================================================================================
+    function main() {
+        // compress both sides of the equation (distrubute, simplify)
+        equation.left.compress();
+        equation.right.compress();
+        debug.log("Compress both sides", equation)
+        
+        // start the term phase
+        // moves no variable terms to the right, variable terms to the left
+        termPhase();
+
+        // is there only one term that contains the variable?
+        if (equation.left.length === 1) {
+            debug.log("Variable reduced to 1 term");
+            factorPhase();
+        } else if (equation.left.length > 1) {
+            debug.log(`Variable found in ${equation.left.length} terms`);
+            solveForMultipleTerms()
+        } else {
+            debug.log(`The given variable "${constants.variables[variable]}" was not found`)
+        }
+
+        debug.groupEnd("Double Sided Solve", equation);
+        return equation;
+    }
+
+
     //===========================================================================================
     //------------------------------------------------------------------------------------term phase
     //===========================================================================================
+    /*
+        Term Phase Part 1
+        Jobs:
+            - Move all the terms on the left side WITHOUT variable to the right
+            - Simplify the right side
+            - Move all terms on the right WITH variable to the left
+            - Simplify the left side
+    */
     function termPhase() {
         debug.group("Term Phase", equation);
+
         //move terms in L without variable to R
         equation.left = equation.left.filter((term) => {
             if (term.hasVariable(variable)) return true;
@@ -20,10 +59,12 @@ export default function doubleSidedSolve(equation, variable) {
                 equation.right.push(termCopy);
             }
         });
+
         //simplify R
         equation.right.simplify();
         debug.log("Move non-variables to R, simplify R", equation);
-        //move terms in R without variable to L
+
+        //move terms in R with variable to L
         equation.right = equation.right.filter((term) => {
             if (!term.hasVariable(variable)) return true;
             else {
@@ -32,13 +73,19 @@ export default function doubleSidedSolve(equation, variable) {
                 equation.left.push(termCopy);
             }
         });
+
         //simplify L
         equation.left.simplify();
         debug.log("Move non-variables to L, simplify L", equation);
         debug.groupEnd("Term Phase", equation); //end term phase
     }
 
-    function multiTerm() {
+    /*
+        Solve For Multiple Terms
+        DESC: Will attempt to factor a single variable out of multiple terms. EX: ax + bx = c --> x(a + b) = c --> x = c / (a + b)
+        
+    */
+    function solveForMultipleTerms() {
         debug.log("Solve for multiple terms", equation.left);
         // attempt to undistribute
         if (equation.left.undistribute() !== 1) {
@@ -93,25 +140,6 @@ export default function doubleSidedSolve(equation, variable) {
         debug.groupEnd("Factor Phase", equation);
     }
 
-    //===========================================================================================
-    //-----------------------------------------------------------------------------------------main
-    //===========================================================================================
-	equation.left.compress();
-	equation.right.compress();
-    debug.log("Compress both sides", equation)
-	
-	termPhase();
-
-	if (equation.left.length === 1) {
-        debug.log("Variable reduced to 1 term");
-        factorPhase();
-    } else if (equation.left.length > 1) {
-        debug.log(`Variable found in ${equation.left.length} terms`);
-        multiTerm()
-    } else {
-        debug.log(`The given variable "${constants.variables[variable]}" was not found`)
-    }
-
-	debug.groupEnd("Double Sided Solve", equation);
-	return equation;
+    
+    return main()
 }

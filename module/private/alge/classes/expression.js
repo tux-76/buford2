@@ -89,8 +89,6 @@ export default class Expression extends Array {
 
 	//-----------------------------------------------------------------------------------------------------distribute
 	distribute(termIndex, recursive=false) {
-		console.log("\t start", termIndex)
-		console.log("new", this.copy(), this.indexOf(term))
 		if (!this[termIndex].isDistributable) return 1;
 		let term = this[termIndex];
 
@@ -146,45 +144,48 @@ export default class Expression extends Array {
 	}
 
 	//------------------------------------------------------------------------------------------------------undistribute
-	/*  */
+	/* 
+		Undistribute Expression
+		DESC: Will attempt to find a common factor in the given terms (inputted as indexes). If 
+	*/
 	undistribute(...termIndexes) {
 		debug.group("Undistribute", this);
 		if (termIndexes.length < 1) termIndexes = this.map((_e, i) => i);
 		
-		// get terms
+		// get actual terms from term indexes
 		let terms = [];
 		termIndexes.forEach(i => terms.push(this[i].copy()));
 		terms.forEach(term => bu2_sort.sort(term));
 		debug.log("Terms to undistribute", terms);
 
-		// make new term with constant set to the gcf of all the terms constants
+		// Create the new term. This will be the final product (ex. "3(a+b)")
+		// Set the new term's constant to the GCF of all the constants of the terms being undistributed
 		let newTerm = new Term(GCF(...terms.map(term => term.constant)));
-		// divide all terms by gcf
+		// Divide each of the terms being undistributed by this GCF (newTerm.constant)
 		terms.forEach((term) => term.constant /= newTerm.constant);
 
-		// get common coefficients
+		// Find the common coefficients (I call them bases here for some reason)
+		// Get the bases of the first term. These will be used to compare to all the other terms.
 		let commonBases = terms[0].coefficients.map(e => e.base);
 		terms.forEach((term) => {
+			// Filter out the original bases that are not in that term
 			commonBases = commonBases.filter(cBase => (bu2_sort.findObject(cBase, term.coefficients.map(e => e.base)) !== -1));
 		});
 		debug.log("Common coefficients", commonBases);
 
 
-		// determine whether to contine and modify data
+		// Determine whether to continue.
+		// If there was no common coefficients or any GCF
 		if (commonBases.length === 0 && newTerm.constant === 1) {
 			debug.groupEnd("Undistribute canceled: No common factors");
 			return 1;
-		} else { // contine
-			terms.forEach(term => {
-				this.splice(bu2_sort.findObject(term, this), 1);
-			});
-			debug.log("Checks passed, deleting terms from expression")
 		}
 		
+		// DATA MODIFIED BEYOND THIS POINT
 
-
-		// get exponents of common bases and add to new term
+		// Get exponents of common bases and add to new term
 		commonBases.forEach(base => {
+			// Set the least exponent of the undistributed terms to infinity
 			let leastExponent = Infinity;
 			terms.forEach(term => {
 				let exponent = term.coefficients[bu2_sort.findObject(base, term.coefficients.map(e => e.base))].exponent
@@ -207,10 +208,15 @@ export default class Expression extends Array {
 		debug.log("New expression", newTerm.coefficients[newTerm.coefficients.length-1]);
 
 
-		// make change
-		termIndexes.forEach(i => this.splice(i, 1)); // remove terms
-		this.push(newTerm);
-
+		// Delete factored terms from expression
+		// Create a list of all the terms that need to be deleted
+		let termsToDelete = termIndexes.map(i => this[i])
+		// Now delete all the terms to delete
+		termsToDelete.forEach(term => {
+			this.splice(this.indexOf(term), 1)
+		})
+		
+		// Add new total undistributed term to expression
 		
 		this.bufordSort();
 		debug.groupEnd("Undistribute", this);
