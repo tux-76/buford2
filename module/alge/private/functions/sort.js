@@ -1,5 +1,5 @@
 
-import * as classes from "../alge-classes.js";
+import * as classes from "../classes.js";
 import * as toString from "./toString.js";
 
 //------------------------------------------------------------sort

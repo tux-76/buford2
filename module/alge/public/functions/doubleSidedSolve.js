@@ -1,5 +1,5 @@
-import { debug, sort as bu2_sort, toString } from "../../private/alge-func.js";
-import { Term, Expression } from "../../private/alge-classes.js";
+import { debug, sort as bu2_sort, toString } from "../../private/functions.js";
+import { Term, Expression } from "../../private/classes.js";
 import * as constants from "../../private/constants.js"
 
 
