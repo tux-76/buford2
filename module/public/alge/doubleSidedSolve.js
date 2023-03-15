@@ -11,16 +11,17 @@ export default function doubleSidedSolve(equation, variable) {
     //-----------------------------------------------------------------------------------------main
     //===========================================================================================
     function main() {
+        // Compression Setup
         // compress both sides of the equation (distrubute, simplify)
         equation.left.compress();
         equation.right.compress();
         debug.log("Compress both sides", equation)
         
-        // start the term phase
+        // Term Phase
         // moves no variable terms to the right, variable terms to the left
         termPhase();
-        debug.error("Double Sided Solve", "sus")
 
+        // Factorish Phase
         // is there only one term that contains the variable?
         if (equation.left.length === 1) {
             debug.log("Variable reduced to 1 term");
@@ -29,9 +30,22 @@ export default function doubleSidedSolve(equation, variable) {
             debug.log(`Variable found in ${equation.left.length} terms`);
             solveForMultipleTerms()
         } else {
+            // There are 0 instances of the variable
             debug.log(`The given variable "${constants.variables[variable]}" was not found`)
         }
 
+        // Exponent Phase
+        // If the above methods suceeded in isolating the variable from Terms, the constant of the variabled term, and Coefficients
+        if (equation.left.length === 1 && equation.left[0].constant === 1 && equation.left[0].coefficients.length === 1) {
+            debug.log("The variable has been isolated from terms and coefficients")
+            variableCoef = equation.left[0].coefficients[0]
+            // If the coef's exponent is NOT 1 (exponent of 1 means removing the exponent is pointless)
+            if (variableCoef.exponent !== 1) {
+                exponentPhase()
+            }
+        }
+
+        // Return
         debug.groupEnd("Double Sided Solve", equation);
         return equation;
     }
@@ -94,7 +108,7 @@ export default function doubleSidedSolve(equation, variable) {
             - If true: Move to factor phase
     */
     function solveForMultipleTerms() {
-        debug.log("Solve for multiple terms", equation.left);
+        debug.group("Solve for multiple terms", equation);
         // attempt to undistribute (0 = Undistributed, 1 = Not possible)
         if (equation.left.undistribute() === 0) {
             // The target is the term that contains the un-distributed expression
@@ -115,6 +129,8 @@ export default function doubleSidedSolve(equation, variable) {
                 factorPhase();
             }
         }
+
+        debug.groupEnd("Solve for multiple terms", equation);
     }
     //===========================================================================================
     //------------------------------------------------------------------------------------factor phase
@@ -123,7 +139,7 @@ export default function doubleSidedSolve(equation, variable) {
         Factor Phase
         WHEN: There is only one term with a variable in it (in equation.left)
         DESC: Will move all coefficients to the other side of the equation, as well as the constant (number).
-        JOBS:
+        STEPS:
             - Divide all terms (right and left) by the constant of the target (variabled term)
 
     */
@@ -132,7 +148,7 @@ export default function doubleSidedSolve(equation, variable) {
         
         // Do checks and give errors
         if (equation.left.length !== 1) {
-            throw new Error(`Factor Phase: Left side of equation must only be 1 term! ${equation.left.length} were given!`)
+            debug.error("Factor Phase", `Must only have one variable on the left side, ${equation.left.length} were given!`)
         }
 
         // The target term, the one we will isolate the variable in 
@@ -165,6 +181,36 @@ export default function doubleSidedSolve(equation, variable) {
         debug.groupEnd("Factor Phase", equation);
     }
 
-    
+    // =============================================================================
+    // ---------------------------------------------------------------------exponent phase
+    // =============================================================================
+    /*
+        Exponent Phase
+        WHEN: There is only one term and all the coefficients have been removed from the variable
+        DESC: Removes the exponent from the variable
+        STEPS:
+            - If the exponent of the variable is a number:
+                - Get the reciprocal and raise the other half of the equation by it
+            - If not: cry
+    */
+    function exponentPhase() {
+        debug.group("Exponent Phase", equation)
+
+        let exponent = equation.left[0].coefficients[0].exponent
+        // If the exponent is a number, not anything crazy like variables or expressions
+        if (typeof exponent === "number") {
+            // Raise the right side of the equation by the exponent
+            // Create new coefficient with base as the right side and new exponent as reciprocal of variable exponent
+            //   EX: 2a + b => Coef:(2a + b)^0.5
+            newRightSideCoef = new Coefficient(equation.right, Math.pow(exponent, -1))
+            // Delete the right side (to replace it with the exponent version)
+            equation.right.splice(0, equation.right.length)
+            // Add a new term with the coefficient to the right side
+        }
+    }
+
+
+    // END END END END END 
+    debug.groupEnd("Exponent Phase", equation)
     return main()
 }
