@@ -1,6 +1,6 @@
-import { Equation, Expression, Term, Coefficient, Variable } from "../../private/alge-classes.js";
+import { Equation, Expression, Term, Coefficient, Variable } from "../../private/classes.js";
 import { simplifyExpression } from "../functions.js";
-import * as debug from "../../private/alge/debug.js";
+import * as debug from "../../private/functions/debug.js";
 import * as constants from "../../private/constants.js";
 
 let sub;

@@ -1,7 +1,7 @@
 
-import { toMachine, toString, debug, sort as bu2_sort } from "../../alge-func.js";
-import { Variable, Coefficient, Term } from "../../alge-classes.js";
-import { GCF } from "../../../public/factor.js";
+import { toMachine, toString, debug, sort as bu2_sort } from "../functions.js";
+import { Variable, Coefficient, Term } from "../classes.js";
+import { GCF } from "../../../factor/public/functions.js";
 
 export default class Expression extends Array {
 	//==========================================================================================================

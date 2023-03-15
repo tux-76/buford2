@@ -1,4 +1,4 @@
-import * as debug from "../../private/alge/debug.js";
+import * as debug from "../../private/functions/debug.js";
 
 export default function simplifyExpression(expression) {
 	debug.group("Simplify Expression", expression);

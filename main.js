@@ -4,12 +4,12 @@
 */
 
 
-import {Variable, Coefficient, Term, Expression, Equation} from "./module/private/alge-classes.js";
-import * as constants from "./module/private/constants.js";
-import { debug, toString } from "./module/private/alge-func.js"
+import {Variable, Coefficient, Term, Expression, Equation} from "./module/alge/private/classes.js";
+import * as constants from "./module/alge/private/constants.js";
+import { debug, toString } from "./module/alge/private/functions.js"
 
-import * as algeFunc from "./module/public/alge.js";
-import * as factor from "./module/public/factor.js"
+import * as algeFunc from "./module/alge/public/functions.js";
+import * as factor from "./module/factor/public/functions.js"
 
 let Buford2 = {alge:{}};
 Buford2.factor = factor;

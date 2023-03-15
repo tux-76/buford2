@@ -1,7 +1,7 @@
 import Buford2 from "./main.js";
-import * as classes from "./module/private/alge-classes.js";
-import * as priv from "./module/private/alge-func.js";
-import * as publ from "./module/public/alge.js";
+import * as classes from "./module/alge/private/classes.js";
+import * as priv from "./module/alge/private/functions.js";
+import * as publ from "./module/alge/public/functions.js";
 
 window.bu2 = Buford2;
 window.bu2._e = {};

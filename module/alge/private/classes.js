@@ -1,7 +1,7 @@
-import Variable from "./alge/classes/variable.js";
-import Coefficient from "./alge/classes/coefficient.js";
-import Term from "./alge/classes/term.js";
-import Expression from "./alge/classes/expression.js";
-import Equation from "./alge/classes/equation.js";
+import Variable from "./classes/variable.js";
+import Coefficient from "./classes/coefficient.js";
+import Term from "./classes/term.js";
+import Expression from "./classes/expression.js";
+import Equation from "./classes/equation.js";
 
 export {Variable, Coefficient, Term, Expression, Equation};

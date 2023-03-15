@@ -1,5 +1,5 @@
-import {Expression} from "../../alge-classes.js"
-import * as constants from "../../constants.js"
+import {Expression} from "../classes.js"
+import * as constants from "../constants.js"
 
 export default class Equation {
 	//========================================================================================================================
