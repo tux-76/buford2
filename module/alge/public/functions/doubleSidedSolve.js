@@ -1,5 +1,5 @@
 import { debug, sort as bu2_sort, toString } from "../../private/functions.js";
-import { Term, Expression } from "../../private/classes.js";
+import { Coefficient, Term, Expression } from "../../private/classes.js";
 import * as constants from "../../private/constants.js"
 
 
@@ -38,7 +38,7 @@ export default function doubleSidedSolve(equation, variable) {
         // If the above methods suceeded in isolating the variable from Terms, the constant of the variabled term, and Coefficients
         if (equation.left.length === 1 && equation.left[0].constant === 1 && equation.left[0].coefficients.length === 1) {
             debug.log("The variable has been isolated from terms and coefficients")
-            variableCoef = equation.left[0].coefficients[0]
+            let variableCoef = equation.left[0].coefficients[0]
             // If the coef's exponent is NOT 1 (exponent of 1 means removing the exponent is pointless)
             if (variableCoef.exponent !== 1) {
                 exponentPhase()
@@ -196,21 +196,30 @@ export default function doubleSidedSolve(equation, variable) {
     function exponentPhase() {
         debug.group("Exponent Phase", equation)
 
-        let exponent = equation.left[0].coefficients[0].exponent
+        let variableCoef = equation.left[0].coefficients[0]
         // If the exponent is a number, not anything crazy like variables or expressions
-        if (typeof exponent === "number") {
+        if (typeof variableCoef.exponent === "number") {
             // Raise the right side of the equation by the exponent
             // Create new coefficient with base as the right side and new exponent as reciprocal of variable exponent
             //   EX: 2a + b => Coef:(2a + b)^0.5
-            newRightSideCoef = new Coefficient(equation.right, Math.pow(exponent, -1))
+            let newRightSideCoef = new Coefficient(equation.right.copy(), Math.pow(variableCoef.exponent, -1))
             // Delete the right side (to replace it with the exponent version)
             equation.right.splice(0, equation.right.length)
             // Add a new term with the coefficient to the right side
+            equation.right.push(new Term(1, [newRightSideCoef]))
+            // Set the varible's exponent to 1
+            variableCoef.exponent = 1
+            debug.log(`Cancel power (${variableCoef.exponent}): Raise by right by reciprocal`, equation)
+            // Simplify the right side
+            equation.right.simplify()
+            debug.log("Simplify", equation)
         }
+
+
+        debug.groupEnd("Exponent Phase", equation)
     }
 
 
     // END END END END END 
-    debug.groupEnd("Exponent Phase", equation)
     return main()
 }

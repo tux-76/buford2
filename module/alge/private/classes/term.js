@@ -4,6 +4,18 @@ import * as toMachine from "../functions/toMachine.js";
 import { toString, sort as bu2_sort } from "../functions.js";
 import {Coefficient, Expression} from "../classes.js";
 
+/*
+	TERM OBJECT
+	- The next sub-unit of an Expression.
+	- Belongs in an array in which every unit is meant to be added 
+	- For example, the string "a + 2b + 2(5+6)" makes 3 terms (before compression)
+
+	Structure:
+	- Term.constant: the numerical value of the term. 
+	- Term.coefficients: an array of Coefficient objects - non-numerical coefficients that are multiplied by the term
+*/
+
+
 export default class Term {
 	//========================================================================================================================
 	//-----------------------------------------------------------------------------------------------------------------constructor
