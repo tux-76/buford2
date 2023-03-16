@@ -25,11 +25,18 @@ export default class Coefficient {
 		let baseStr = sliced[0];
 		let exponentStr = sliced[1];
 		
-		//handle exponent str
+		// Handle Exponent Str
 		let exponentType = toMachine.interpretMathString(exponentStr);
+		// If the exponent is just a straight number then parse it
 		if (exponentType.type === "num") this.exponent = parseFloat(exponentStr);
+		// If there is no exponent just set it to one
 		else if (exponentType.type === "emp") this.exponent = 1;
-		else console.error(`Input error for string "${exponentStr}": only numerical values are allowed for exponents at this moment :(`);
+		// If the exponent is a variable set it to a variable object
+		else if (exponentType.type === "var") this.exponent = new Variable(exponentStr);
+		// If the type is unknown
+		else if (exponentType.type === "non") console.error(`Input error for string "${exponentStr}": I have no clue what this is!`);
+		// If the type is known but unsupported
+		else console.error(`Input error for string "${exponentStr}": Type ${exponentType.type} is not supported!`)
 
 		//handle base str division
 		let baseType = toMachine.interpretMathString(baseStr);
@@ -105,6 +112,6 @@ export default class Coefficient {
 		}
 
 		if (isNaN(this.base) && !(this.base instanceof Variable)) this.base.simplify();
-		if (isNaN(this.exponent) && !(this.base instanceof Variable)) this.exponent.simplify();
+		if (isNaN(this.exponent) && !(this.exponent instanceof Variable)) this.exponent.simplify();
 	}
 }

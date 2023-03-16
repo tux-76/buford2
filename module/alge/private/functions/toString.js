@@ -36,7 +36,7 @@ export function basic(value, mode="normal") {
 		let side2 = basic(value.right, "no parenthesis");
 		return (side1 || '0') + ` ${constants.operationSymbols[value.operation]} ` + (side2 || '0');
 	}
-	else console.error(`toString did not recognize value:`, value);
+	else console.error(`toString did not recognize value: ${value}`);
 }
 
 export function pretty(value) {

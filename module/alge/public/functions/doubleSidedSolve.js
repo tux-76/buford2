@@ -148,7 +148,7 @@ export default function doubleSidedSolve(equation, variable) {
         
         // Do checks and give errors
         if (equation.left.length !== 1) {
-            debug.error("Factor Phase", `Must only have one variable on the left side, ${equation.left.length} were given!`)
+            console.error("Factor Phase", `Must only have one variable on the left side, ${equation.left.length} were given!`)
         }
 
         // The target term, the one we will isolate the variable in 
@@ -213,7 +213,7 @@ export default function doubleSidedSolve(equation, variable) {
             // Simplify the right side
             equation.right.simplify()
             debug.log("Simplify", equation)
-        }
+        } else debug.log("Buford2 cannot compute non-numerical exponents at this time :(")
 
 
         debug.groupEnd("Exponent Phase", equation)
