@@ -11,6 +11,7 @@ import substituteVariable from "./functions/substituteVariable.js";
 import { variables } from "../private/constants.js";
 import { toString } from "../private/functions.js";
 import { Equation, Expression } from "../private/classes.js";
+import { formatInputString as fstr } from "../private/functions/toMachine.js";
 
 
 
@@ -32,16 +33,16 @@ import { Equation, Expression } from "../private/classes.js";
 export const userMods = {
     "simplifyExpression": {
         "in": (stringExp) => [new Expression(stringExp)],
-        "out": (expression) => toString.pretty(expression)
+        "out": (expression) => toString.pretty(fstr(expression))
     },
     // IN: equation string, varable character
     "doubleSidedSolve": {
-        "in": (stringEq, variableChar) => [new Equation(stringEq), variables.indexOf(variableChar)],
+        "in": (stringEq, variableChar) => [new Equation(fstr(stringEq)), variables.indexOf(variableChar)],
         "out": (equation) => toString.pretty(equation)
     },
     // IN: expression string, variable char, expression replacement
     "substituteVariable": {
-        "in": (originalStr, varChar, replaceStr) => [new Expression(originalStr), variables.indexOf(varChar), new Expression(replaceStr)],
+        "in": (originalStr, varChar, replaceStr) => [new Expression(fstr(originalStr)), variables.indexOf(varChar), new Expression(fstr(replaceStr))],
         "out": (any) => toString.pretty(any)
     },
 }

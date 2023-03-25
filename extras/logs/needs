@@ -1,4 +1,5 @@
 ALGEBRA
 - Substitute variable has support for any types in the original and the replacement, yet the user function only has expressions for each
     - Need to create a "best fit" function in to machine
-- Create formulas section?
+
+- Quadratic formula only gives one answer and doesn't do imaginary
