@@ -1,0 +1,5 @@
+Add the function file to module/alge/public/functions
+
+In functions.js:
+    - Add export
+    - Add userMod

@@ -40,5 +40,6 @@ export function basic(value, mode="normal") {
 }
 
 export function pretty(value) {
-	
+	// TEMPORARY
+	return basic(value)
 }

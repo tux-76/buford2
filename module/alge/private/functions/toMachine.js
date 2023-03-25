@@ -47,3 +47,30 @@ export function interpretMathString(mathString) {
 	}
 	return type
 }
+
+// Formats the input string to a certain extent to allow for easier interpretation (remove spaces and stuff like that)
+export function formatInputString(string) {
+	string = string.split(" ").join("");
+	string = string.split("--").join("+")
+
+	debug.log("Format String", `"${string}"`);
+	return string
+}
+
+/*
+	Modify User Input
+	DESC: Modifies the user input to machine readable format based on the function given
+	argMods: [
+		FUNCTION HERE,
+		FUNCTION HERE,
+		string => new Expression(string)
+	]
+*/
+export function modifyUserInput(argMods, ...args) {
+	let newArgs = [];
+	// For each arguement of the function
+	args.forEach((arg, i) => {
+		// Get the modification function with the index and pass the arguement into it.
+		newArgs.push(argMods[i](arg));
+	});
+}

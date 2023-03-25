@@ -1,3 +1,14 @@
+/*
+    SUBSTITUTE VARIABLE
+
+    Will replace the variable in a given equation with something (right now it will just be expression)
+
+    INPUT: original thingy (any class), the variable index to replace, the replacement (any class)
+*/
+
+
+
+
 import { Equation, Expression, Term, Coefficient, Variable } from "../../private/classes.js";
 import { simplifyExpression } from "../functions.js";
 import * as debug from "../../private/functions/debug.js";
@@ -23,13 +34,13 @@ function loop(anyClass) {
     return anyClass;
 }
 
-export default function substituteVariable(anyClass, variableIndexIn, subIn) {
+export default function substituteVariable(anyClass, variableIndexInput, subInput) {
     debug.group("Substitute Variable", anyClass);
-    debug.log("Variable To Sub", constants.variables[variableIndexIn]);
-    debug.log("Sub Value", subIn)
+    debug.log("Variable To Sub", constants.variables[variableIndexInput]);
+    debug.log("Sub Value", subInput)
 
-    sub = subIn;
-    variableIndex = variableIndexIn;
+    sub = subInput;
+    variableIndex = variableIndexInput;
 
     anyClass = loop(anyClass);
     debug.log("Substituted", anyClass)

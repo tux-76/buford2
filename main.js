@@ -3,53 +3,48 @@
 	For an easy to use gui for each of the public functions, head to https://tux-76.github.io/buford2
 */
 
-
-import {Variable, Coefficient, Term, Expression, Equation} from "./module/alge/private/classes.js";
-import * as constants from "./module/alge/private/constants.js";
-import { debug, toString } from "./module/alge/private/functions.js"
-
 import * as algeFunc from "./module/alge/public/functions.js";
 import * as factor from "./module/factor/public/functions.js"
 
-let Buford2 = {alge:{}};
+
+
+
+
+/*
+	Buford2 home structure setup
+
+	alge:
+		An empty object, functions will be added with their inputs and outputs changed
+*/
+let Buford2 = {};
 Buford2.factor = factor;
 
-function algeFunctionInputs(mode, string, ...otherArgs) {
-	if (mode === "simplifyExpression") 
-		return algeFunc[mode](new Expression(string));
-	else if (mode === "doubleSidedSolve") 
-		return algeFunc[mode](new Equation(string), constants.variables.indexOf(otherArgs[0]));
-	else if (mode === "substituteVariable") 
-		return algeFunc[mode](new Expression(string), constants.variables.indexOf(otherArgs[0]), otherArgs[1]);
+
+// =========================================================================================
+// ---------------------------------------------------------------------------------algebra function inputs and stuff
+// =========================================================================================
+Buford2.alge = {};
+// loop through all the algebra exports except for the user modifications
+for (const key in algeFunc) if (key !== "userMods") {
+	const rawFunc = algeFunc[key]
+	const inputMod = algeFunc.userMods[key].in
+	const outputMod = algeFunc.userMods[key].out
+	// Create the function in Buford2
+	Buford2.alge[key] = function (...args) {
+		// Return function with the input and output modified
+		// Distribute the string arguements to inputMod, then distribute that into the raw func and then modify the output
+		return outputMod(rawFunc(...inputMod(...args)))
+	}
 }
 
-function algebraFunctionWrap(mode, ...args) {
-	debug.group(`Buford2`, `"${args[0]}"`, 0);
-	debug.log("Mode", mode);
-	let retr;
 
-	//format string
-	let string = args[0];
-	string = string.split(" ").join("");
-	string = string.split("--").join("+")
-	debug.log("Format String", `"${string}"`);
-	
-	retr = algeFunctionInputs(mode, string, ...args.slice(1));
 
-	debug.groupEnd("Buford2", retr);
-	return toString.basic(retr, "no parenthesis");
-}
-
-// add all functions as wrapped
-for (const key in algeFunc) {
-	Buford2.alge[key] = (...args) => algebraFunctionWrap(key, ...args);
-}
 
 export default Buford2;
 console.log("Buford2 module exported.");
 
 /*
--------Written by c1uq92-------
+-------Written by Tux76-------
 
 Timeline:
 	-SAT 11:15 02/12/2022: Buford2 Algebra started
@@ -59,7 +54,7 @@ Timeline:
 	-MON 20:08 09/12/2022: Changed the data structure once again. This time we have classes for Expression, Term, and Coefficient. This allows for more specialized methods involving each.
 	-SUN 09:34 09/25/2022: First operational version of "simplify expression" mode!
 	-MON 19:36 09/26/2022: We are now caught up to the first version of Buford in functionality! Yet this time with a long road of improvement ahead :)
-	-THU 19:52 10/06/2022: Attempt to change the structure to a more modular based approach. A little bit difficult because I don't know how to keep all the ties to other functions I've created.
+	-THU 19:52 10/06/2022: Attempt to change the structure to a more modular based approach. A little bit difficult because I don't know how to keep all the ties to other functions I've created. But it succeeded in the end.
 	-FRI 11:55 11/25/2022: Create rough dynamic site for Buford2 (Dynamic in updating with updates to "index.json"). Looking really classy at https://tux-76.github.io/buford2
-	- I JUST DID SOMETHING
+	-SUN 14:35 03/19/2023: New year! Also a month past Buford2's birthdate (more like conception date).
 */
