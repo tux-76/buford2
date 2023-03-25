@@ -13,6 +13,7 @@ import {Coefficient, Expression} from "../classes.js";
 	Structure:
 	- Term.constant: the numerical value of the term. 
 	- Term.coefficients: an array of Coefficient objects - non-numerical coefficients that are multiplied by the term
+	- Term.plusMinus: boolean, if true the term's constant can be either positive or negative
 */
 
 
@@ -29,13 +30,13 @@ export default class Term {
 		let lastType = 'none';
 		let parenStacks = 0;
 
+		// Add symbols for implied multiplication
 		splitStr.forEach((char, i) => {
 			let thisType = 'none';
 			if (constants.variables.includes(char)) thisType = char;
 			else if (constants.numbers.includes(char)) thisType = 'num';
 			else if (constants.parenthesis.slice(0,3).includes(char)) thisType = 'open paren';
 			else if (constants.parenthesis.slice(3,6).includes(char)) thisType = 'close paren';
-			else thisType = 'none';
 
 			if (
 				lastType !== thisType && 
@@ -57,8 +58,9 @@ export default class Term {
 	//-------------------------------------------------------------------------------------------constructor
 	constant = 1;
 	coefficients = [];
+	plusMinus = false;
+
 	#stringConstuctor(mathString) {
-		//main
 		let slices = this.#sliceAtFactors(mathString);
 		slices.forEach(factor => { //for all the factors of the term:
 			let factorType = toMachine.interpretMathString(factor);
@@ -66,6 +68,10 @@ export default class Term {
 			if (factorType.type === "num") {
 				if (factorType.influence === "div") { //if the number is divided: set to reciprocal
 					this.constant *= Math.pow(parseFloat(factor.slice(1)), -1); // constant * factor(without '/') ^ -1
+				} else if (factorType.influence === "pm") {
+					console.log("PLUS OR MINUS YAYAY")
+					this.plusMinus = true;
+					this.constant = parseFloat(factor)
 				} else { //the number is just as is
 					this.constant *= parseFloat(factor);
 				}
@@ -74,10 +80,12 @@ export default class Term {
 			}
 		});
 	}
+
 	#manualConstructor(constant, coefficients=[]) {
 		this.constant = constant;
 		this.coefficients = coefficients;
 	}
+
 	constructor(arg1, arg2) {
 		if (typeof arg1 === "string") this.#stringConstuctor(arg1);
 		else this.#manualConstructor(arg1, arg2);

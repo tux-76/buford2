@@ -1,0 +1,7 @@
+The syntax for Buford2 is very basic
+
+() or [] can be used to change order of operations ex. 2 * (2a + b)
+
+
+Special Character Assignments:
+- '+~-' => '±'

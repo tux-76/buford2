@@ -2,6 +2,7 @@
 import { toMachine, toString, debug, sort as bu2_sort } from "../functions.js";
 import { Variable, Coefficient, Term } from "../classes.js";
 import { GCF } from "../../../factor/public/functions.js";
+import { specialCharactersReplacements as SCHAR } from "../constants.js";
 
 export default class Expression extends Array {
 	//==========================================================================================================
@@ -9,7 +10,7 @@ export default class Expression extends Array {
 	//==========================================================================================================
 	
 	#sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
-		return toMachine.split(string, '+', '-');
+		return toMachine.split(string, '+', '-', SCHAR["+~-"]);
 	} //end sliceAtTerms
 
 	//---------------------------------------------------------------------------------------------constructor
@@ -17,7 +18,7 @@ export default class Expression extends Array {
 		// console.log("Expression string", string);
 
 		let slices = this.#sliceAtTerms(string);
-
+		console.log(slices)
 		for (let i = 0; i<slices.length; i++) {
 			this[i] = new Term(slices[i]);
 		}
