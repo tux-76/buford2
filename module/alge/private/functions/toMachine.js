@@ -2,26 +2,10 @@ import * as constants from "../constants.js";
 import { debug } from "../functions.js";
 import { specialCharactersReplacements as SCHAR } from "../constants.js";
 
-export function split(string, exclusiveChar, inclusiveChar) {
-	let negates = ['^', '#', '*', '/'];
+export function split(string, exclusiveChars, inclusiveChars) {
+	let parenStack = 0 // Make sure we don't split through a parenthesis
 
-	let parenStack = 0;
-	let builder = "";
-	let output = [];
 
-	let splitArr = string.split("");
-	splitArr.forEach((char, i) => {
-		// exclusive and inclusive chars
-		if ([exclusiveChar, inclusiveChar].includes(char) && parenStack === 0 && !negates.includes(splitArr[i-1])) {
-			output.push(builder); builder = (char === exclusiveChar) ? "" : inclusiveChar;
-		} else {
-			// open and close parens
-			if (constants.parenthesis.includes(char)) parenStack += (constants.parenthesis.indexOf(char) < 3) ? 1 : -1;
-
-			builder += char;
-		}
-	});
-	return output.concat([builder]).filter(e => e !== '');
 }
 
 //-------------------------------------------------------------------------------identify string
