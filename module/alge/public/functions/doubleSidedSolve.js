@@ -17,6 +17,12 @@ export default function doubleSidedSolve(equation, variable) {
         equation.right.compress();
         debug.log("Compress both sides", equation)
         
+        let mulitpleEquations = false
+        // Check for if there are multiple equations (or basically if theres a plus or minus)
+        equation.left.concat(equation.right).forEach(term => {
+            if (term.plusMinus) mulitpleEquations = true;
+        })
+
         // Term Phase
         // moves no variable terms to the right, variable terms to the left
         termPhase();

@@ -69,9 +69,10 @@ export default class Term {
 				if (factorType.influence === "div") { //if the number is divided: set to reciprocal
 					this.constant *= Math.pow(parseFloat(factor.slice(1)), -1); // constant * factor(without '/') ^ -1
 				} else if (factorType.influence === "pm") {
-					console.log("PLUS OR MINUS YAYAY")
+					// It's plus or minus
 					this.plusMinus = true;
-					this.constant = parseFloat(factor)
+					// set the constant to the factor without the plus minus
+					this.constant = parseFloat(factor.slice(1))
 				} else { //the number is just as is
 					this.constant *= parseFloat(factor);
 				}

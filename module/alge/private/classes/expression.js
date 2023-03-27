@@ -10,7 +10,7 @@ export default class Expression extends Array {
 	//==========================================================================================================
 	
 	#sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
-		return toMachine.split(string, '+', '-', SCHAR["+~-"]);
+		return toMachine.split(string, '+', ['-', SCHAR["+~-"]]);
 	} //end sliceAtTerms
 
 	//---------------------------------------------------------------------------------------------constructor
@@ -18,7 +18,6 @@ export default class Expression extends Array {
 		// console.log("Expression string", string);
 
 		let slices = this.#sliceAtTerms(string);
-		console.log(slices)
 		for (let i = 0; i<slices.length; i++) {
 			this[i] = new Term(slices[i]);
 		}
@@ -113,7 +112,6 @@ export default class Expression extends Array {
 		//recurse if set to
 		if (recursive) {
 			newTerms.forEach(newTerm => {
-				console.log("\t\tnew term", toString.basic(newTerm), this.indexOf(newTerm))
 				if (newTerm.isDistributable) this.distribute(this.indexOf(newTerm), true);
 			});
 		}
@@ -137,7 +135,6 @@ export default class Expression extends Array {
 	compress() {
 		debug.group("Compress expression", this);
 
-		console.log("original", this.copy())
 		this.distributeAll();
 		this.simplify();
 

@@ -8,5 +8,12 @@ export const operationSymbols = ['=', '<', '>'];
 // The key is the input that will be replaced with the other.
 // There is a list of ASCII math symbols here http://asciimath.org/
 export const specialCharactersReplacements = {
-    "+~-":"±"
+    "oo":"∞",
+    "+~-":"±",
+
+    // not in basic
+    "-": "−",
+
+    "/":"÷",
+    "*":"⋅",
 }

@@ -6,4 +6,4 @@
 
 // ALGEBRA
 // NOTE: 
-export const quadraticFormula = "(-b+(b^2-4ac)^0.5)/(2a)"
+export const quadraticFormula = "(-b+~-(b^2-4ac)^0.5)/(2a)"
