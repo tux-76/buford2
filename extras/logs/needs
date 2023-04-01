@@ -2,6 +2,10 @@ ALGEBRA
 
 - "this.constant *= Math.pow(parseFloat(factor.slice(1)), -1);": Only Expects numerical exponents!
 
+- New toString modes
+    - A "pretty" form of toString that uses special ASCII characters
+    - A website form return using MathJax
+
 - Substitute variable has support for any types in the original and the replacement, yet the user function only has 
     expressions for each
     - Need to create a "best fit" function to choose class from string in to machine
@@ -11,3 +15,4 @@ ALGEBRA
 - Have different "targets" for simplifyExpression. Some targets may be: compactness, readablility, descending exponent
 
 - Compress Expression doesn't know how to keep plus or minuses and ends up discarding them
+
