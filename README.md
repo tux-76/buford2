@@ -29,9 +29,9 @@ The syntax of Buford2 is pretty basic, as it is meant to closely reflect what th
 ### Abilities
 
 **Basic Algebra**
-1. Will "move" terms without a variable to the right and terms with a variable to the left
-    2. If there is only one term with a variable:
-        3. will divide the other factors out to isolate the variable
-        4. Will remove the exponent of the isolated variable.
-    5. If there are multiple terms with a variable:
-        6. Will attempt to undistribute it (2x+3ax => x(2+3a)). If successful, go to 2.
+- Will "move" terms without a variable to the right and terms with a variable to the left
+    - If there is only one term with a variable:
+        - will divide the other factors out to isolate the variable
+        - Will remove the exponent of the isolated variable.
+    - If there are multiple terms with a variable:
+        - Will attempt to undistribute it (2x+3ax => x(2+3a)). If successful, go to 2.
