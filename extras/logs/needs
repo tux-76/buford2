@@ -1,5 +1,10 @@
 ALGEBRA
-- Substitute variable has support for any types in the original and the replacement, yet the user function only has expressions for each
-    - Need to create a "best fit" function in to machine
+- Substitute variable has support for any types in the original and the replacement, yet the user function only has 
+    expressions for each
+    - Need to create a "best fit" function to choose class from string in to machine
 
 - Quadratic formula only gives one answer and doesn't do imaginary
+
+- Have different "targets" for simplifyExpression. Some targets may be: compactness, readablility, descending exponent
+
+- 

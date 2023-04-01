@@ -1,7 +1,19 @@
+/*
+    BUFORD 2 DOUBLE SIDED SOLVE
+
+    DESC:
+        Solves a two sided equation. Will perform arithmetic means to reach the target
+
+    TARGET:
+        ULTIMATE: Isolate the variable on the left side of the equation
+        SECONDARY: Create a highly simplized for 
+
+    CAN DO:
+        - 
+*/
 import { debug, sort as bu2_sort, toString } from "../../private/functions.js";
 import { Coefficient, Term, Expression } from "../../private/classes.js";
 import * as constants from "../../private/constants.js"
-
 
 export default function doubleSidedSolve(equation, variable) {
 	debug.group("Double Sided Solve", equation);

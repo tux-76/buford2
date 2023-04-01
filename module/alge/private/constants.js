@@ -10,10 +10,4 @@ export const operationSymbols = ['=', '<', '>'];
 export const specialCharactersReplacements = {
     "oo":"∞",
     "+~-":"±",
-
-    // not in basic
-    "-": "−",
-
-    "/":"÷",
-    "*":"⋅",
 }
