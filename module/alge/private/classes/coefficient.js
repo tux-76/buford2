@@ -58,7 +58,7 @@ export default class Coefficient {
 			this.base = new Expression(baseStr.slice(1, baseStr.length-1));
 		} else if (baseType.type === "neg") {
 			this.base = -1;
-		} else console.error(`Coefficient base type "${baseType.type}" does not have a handler.`);
+		} else console.error(`Input error for string "${baseStr}": Type ${baseType.type} is not supported!`);
 	}
 	#manualConstructor(base, exponent) {
 		this.base = base;

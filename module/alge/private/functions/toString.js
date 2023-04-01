@@ -31,12 +31,14 @@ export function basic(value, mode="normal") {
 		let string = ""
 		// For every term in the expression
 		value.forEach((term) => {
-			// If the term is not plus or minus
-			if (term.plusMinus === false)
-				// Only add a plus
-				string += basic(term) + "+"
+			// Add operator
+			string += term.plusMinus ? SCHAR["+~-"] : "+";
+			// Add the term to the string
+			string += basic(term);
 		}); 
-		string = string.substring(0, string.length-1);
+
+		// Remove the plus at the beginning
+		if (string[0] === "+") string = string.slice(1)
 		return (mode === "no parenthesis") ? string : `(${string})`
 	}
 	else if (value instanceof classes.Equation) {

@@ -47,22 +47,26 @@ export function split(string, exclusiveChars=[], inclusiveChars=[]) {
 export function interpretMathString(mathString) {
 	let type = {
 		influence: "nul",
-		type: "err"
+		type: "err",
+		plusMinus: false
 	}
 	
-	// Influence: 
+	// Influence:
 	if (mathString[0] === "/") {
 		type.influence = "div";
 		mathString = mathString.slice(1);
-	} else if (mathString[0] === SCHAR["+~-"]) {// Plus or minus
-		type.influence = "pm"
+	}
+
+	// Check if there is a plus or minus
+	if (mathString[0] === SCHAR["+~-"]) { // Plus or minus
+		type.plusMinus = true
 		mathString = mathString.slice(1);
 	}
 
 	// Type
 	if (mathString === "") {
 		type.type = "emp";
-	} else if (!isNaN(mathString)) {
+	} else if (!isNaN(mathString)) { // number
 		type.type = "num";
 	} else if (constants.variables.includes(mathString)) {
 		type.type = "var";

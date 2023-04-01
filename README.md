@@ -19,7 +19,7 @@ The syntax of Buford2 is pretty basic, as it is meant to closely reflect what th
 *Note: To do square roots, raise a number by the inverse (1/2)*
 
 **Order of Operations**
-- Order of operations follows traditional rules (PEMDAS if you remeber 4th grade). Here it is:
+- Order of operations follows traditional rules (PEMDAS if you remember 4th grade). Here it is:
     1. Parenthesis ('()', '[]')
     2. Exponents
     3. Multiplication and Division
@@ -28,7 +28,7 @@ The syntax of Buford2 is pretty basic, as it is meant to closely reflect what th
 
 ### Abilities
 
-**Basic Algebra**
+**Basic solving**
 - Will "move" terms without a variable to the right and terms with a variable to the left
     - If there is only one term with a variable:
         - will divide the other factors out to isolate the variable

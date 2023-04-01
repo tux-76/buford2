@@ -63,19 +63,32 @@ export default class Term {
 	#stringConstuctor(mathString) {
 		let slices = this.#sliceAtFactors(mathString);
 		slices.forEach(factor => { //for all the factors of the term:
+			// console.log("factor", factor)
 			let factorType = toMachine.interpretMathString(factor);
 
+			// If the factor has a plus minus
+			if (factorType.plusMinus) {
+				// Set flag to true
+				this.plusMinus = true;
+
+				// Remove the plus minus sign 
+				// Must wrap splice function with .split() and .join() to create array to run splice
+				factor = factor.split("")
+				// Remove the plus minus. If division it will be on index [1]
+				factor.splice(factorType.influence !== "div" ? 0 : 1, 1)
+				factor = factor.join("")
+				// console.log("\tno pm", factor)
+			}
+
+			// Now determine what to do with the factor given, start off by asking if number
 			if (factorType.type === "num") {
 				if (factorType.influence === "div") { //if the number is divided: set to reciprocal
 					this.constant *= Math.pow(parseFloat(factor.slice(1)), -1); // constant * factor(without '/') ^ -1
-				} else if (factorType.influence === "pm") {
-					// It's plus or minus
-					this.plusMinus = true;
-					// set the constant to the factor without the plus minus
-					this.constant = parseFloat(factor.slice(1))
 				} else { //the number is just as is
 					this.constant *= parseFloat(factor);
 				}
+			} else if (factorType.type === "neg") {
+				this.constant *= -1
 			} else {
 				this.coefficients.push(new Coefficient(factor));
 			}

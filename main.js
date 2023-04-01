@@ -5,6 +5,7 @@
 
 import * as algeFunc from "./module/alge/public/functions.js";
 import * as factor from "./module/factor/public/functions.js"
+import * as formulas from "./module/alge/public/formulas.js"
 
 
 
@@ -21,7 +22,7 @@ Buford2.factor = factor;
 
 
 // =========================================================================================
-// ---------------------------------------------------------------------------------algebra function inputs and stuff
+// -----------------------------------------------------------algebra function inputs and stuff
 // =========================================================================================
 Buford2.alge = {};
 // loop through all the algebra exports except for the user modifications
@@ -37,9 +38,15 @@ for (const key in algeFunc) if (key !== "userMods") {
 	}
 }
 
+// Add formulas
+Buford2.alge.formulas = formulas
 
 
 
+
+// =========================================================================================
+// --------------------------------------------------------------------------------------export
+// =========================================================================================
 export default Buford2;
 console.log("Buford2 module exported.");
 
