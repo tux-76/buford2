@@ -82,6 +82,9 @@ export function interpretMathString(mathString) {
 
 // Formats the input string to a certain extent to allow for easier interpretation (remove spaces and stuff like that)
 export function formatInputString(string) {
+	// Error checking
+	if (typeof string !== "string") debug.error("That is not a string!", string)
+	
 	// Remove spaces
 	string = string.split(" ").join("");
 
