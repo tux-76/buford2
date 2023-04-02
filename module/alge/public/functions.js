@@ -11,7 +11,7 @@ import substituteVariable from "./functions/substituteVariable.js";
 import { variables } from "../private/constants.js";
 import { toString } from "../private/functions.js";
 import { Equation, Expression } from "../private/classes.js";
-import { formatInputString as fstr } from "../private/functions/toMachine.js";
+import { translate, formatInputString as fstr } from "../private/functions/toMachine.js";
 
 
 
@@ -40,9 +40,9 @@ export const userMods = {
         "in": (stringEq, variableChar) => [new Equation(fstr(stringEq)), variables.indexOf(variableChar)],
         "out": (equation) => toString.pretty(equation)
     },
-    // IN: expression string, variable char, expression replacement
+    // IN: any class, variable char, any class variable replacement
     "substituteVariable": {
-        "in": (originalStr, varChar, replaceStr) => [new Expression(fstr(originalStr)), variables.indexOf(varChar), new Expression(fstr(replaceStr))],
+        "in": (originalStr, varChar, replaceStr) => [translate(originalStr), variables.indexOf(varChar), translate(replaceStr, "coef friendly")],
         "out": (any) => toString.pretty(any)
     },
 }

@@ -18,7 +18,7 @@
             "type":"func",
 
             "name":"Solve Double Sided Equation",
-            "desc":"Will simplify and distill the given variable from the left side of the equation.",
+            "desc":"Will attmpt to isolate the variable into the left side of the equation.",
             "inputs":["Equation", "Variable to solve for"],
             "inTypes":["str", "char"]
         },
@@ -67,18 +67,6 @@
             "desc":"Will determine if an integer is prime or composite.",
             "inputs":["Integer"],
             "inTypes":["num"]
-        }
-    },
-
-    "geometry":{
-        "type":"dir",
-        "name": "Geometry",
-
-        "triangle": {
-            "type":"dir",
-            "name":"Triangle"
-
-            
         }
     }
 }

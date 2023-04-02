@@ -45,7 +45,7 @@ export default class Equation {
 
 		this.left = new Expression(sliced[0][0]);
 		this.right = new Expression(sliced[0][1]);
-		this.operation = constants.operationSymbols.indexOf(sliced[1][0]);
+		this.operation = constants.equalitySymbols.indexOf(sliced[1][0]);
 	}
 
 	//========================================================================================================================
@@ -56,6 +56,12 @@ export default class Equation {
 	//========================================================================================================================
 	//-------------------------------------------------------------------------------------------------------------------modifiers
 	//========================================================================================================================
+	// -----------------------------------------------------simplify
+	simplify() {
+		this.left.simplify()
+		this.right.simplify()
+	}
+
 	//------------------------------------------------------swap sides
 	swap() {
 		let oldRight = this.right.slice();

@@ -1,18 +1,15 @@
 ALGEBRA
 
+- Rename doubleSidedSolve to solveTwoSidedEquation for clarity
+
 - "this.constant *= Math.pow(parseFloat(factor.slice(1)), -1);": Only Expects numerical exponents!
 
 - New toString modes
     - A "pretty" form of toString that uses special ASCII characters
     - A website form return using MathJax
 
-- Substitute variable has support for any types in the original and the replacement, yet the user function only has 
-    expressions for each
-    - Need to create a "best fit" function to choose class from string in to machine
-
-- Quadratic formula only gives one answer and doesn't do imaginary
-
 - Have different "targets" for simplifyExpression. Some targets may be: compactness, readablility, descending exponent
 
-- Compress Expression doesn't know how to keep plus or minuses and ends up discarding them
+- Create formula function
 
+- Compress Expression doesn't know how to keep plus or minuses and ends up discarding them

@@ -63,11 +63,16 @@ export default class Expression extends Array {
 
 	//---------------------------------------------------------------------------------------------simplify
 	simplify() {
+		// simplify all the terms
 		this.forEach(e => e.simplify());
 
+		// The end product
 		let simplified = [];
+		// For every term in myself
 		this.forEach(term => {
+			// A flag for if there is a match in simplified
 			let matchFound = false;
+			// For every entry in the 
 			for (let i = 0; (i < simplified.length) && !matchFound; i++) {
 				let simpTerm = simplified[i];
 				if (term.compareTerms(simpTerm)) {

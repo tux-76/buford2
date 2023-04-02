@@ -45,7 +45,7 @@ export default function substituteVariable(anyClass, variableIndexInput, subInpu
     anyClass = loop(anyClass);
     debug.log("Substituted", anyClass)
 
-    simplifyExpression(anyClass);
+    if (isNaN(anyClass)) anyClass.simplify()
 
     debug.groupEnd("Substitute Variable", anyClass)
     return anyClass;
