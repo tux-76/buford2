@@ -165,9 +165,8 @@ export default function doubleSidedSolve(equation, variable) {
         debug.group("Factor Phase", equation);
         
         // Do checks and give errors
-        if (equation.left.length !== 1) {
+        if (equation.left.length !== 1) 
             console.error("Factor Phase", `Must only have one variable on the left side, ${equation.left.length} were given!`)
-        }
 
         // The target term, the one we will isolate the variable in 
         let target = equation.left[0];
@@ -193,6 +192,7 @@ export default function doubleSidedSolve(equation, variable) {
                 return newCoef;
             }));
         });
+        // Simplify the right side
         equation.right.simplify();
         debug.log("Move Target's Other Variables", equation)
 

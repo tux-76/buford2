@@ -10,6 +10,7 @@ ALGEBRA
 
 - Have different "targets" for simplifyExpression. Some targets may be: compactness, readablility, descending exponent
 
-- Create formula function
+- Need some form of system of equations for plus or minuses. There needs to be some way to split it up.
+    - Should it be a system of eqautions? Will that be confused with a two variable system of equations?
 
-- Compress Expression doesn't know how to keep plus or minuses and ends up discarding them
+- doubleSidedSolve exponent phase cannot take the square root of a negative number.

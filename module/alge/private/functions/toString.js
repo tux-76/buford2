@@ -44,9 +44,9 @@ export function basic(value, mode="normal") {
 	else if (value instanceof classes.Equation) {
 		let side1 = basic(value.left, "no parenthesis");
 		let side2 = basic(value.right, "no parenthesis");
-		return (side1 || '0') + ` ${constants.equalitySymbols[value.operation]} ` + (side2 || '0');
+		return (side1 || '0') + `${constants.equalitySymbols[value.operation]}` + (side2 || '0');
 	}
-	else console.error(`toString did not recognize value: ${value}`);
+	else console.error(`toString did not recognize value: ${value}. Raw:`, value);
 }
 
 

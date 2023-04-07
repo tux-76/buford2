@@ -3,9 +3,10 @@
 	For an easy to use gui for each of the public functions, head to https://tux-76.github.io/buford2
 */
 
-import * as algeFunc from "./module/alge/public/functions.js";
+import * as algeFunctions from "./module/alge/public/functions.js";
 import * as factor from "./module/factor/public/functions.js"
 import * as formulas from "./module/alge/public/formulas.js"
+import { debug } from "./module/alge/private/functions.js";
 
 
 
@@ -26,15 +27,20 @@ Buford2.factor = factor;
 // =========================================================================================
 Buford2.alge = {};
 // loop through all the algebra exports except for the user modifications
-for (const key in algeFunc) if (key !== "userMods") {
-	const rawFunc = algeFunc[key]
-	const inputMod = algeFunc.userMods[key].in
-	const outputMod = algeFunc.userMods[key].out
+for (const functionKey in algeFunctions) if (functionKey !== "userMods") {
+	// The main function with input values 
+	const baseFunc = algeFunctions[functionKey]
+	// Input mod variable
+	const inputMod = algeFunctions.userMods[functionKey].in
+	if (inputMod === undefined) debug.error(`Input modifier for ${functionKey} isn't set up right`)
+	// Output mod variable
+	const outputMod = algeFunctions.userMods[functionKey].out
+	if (outputMod === undefined) debug.error(`Output modifier for ${functionKey} isn't set up right`)
 	// Create the function in Buford2
-	Buford2.alge[key] = function (...args) {
+	Buford2.alge[functionKey] = function (...args) {
 		// Return function with the input and output modified
 		// Distribute the string arguements to inputMod, then distribute that into the raw func and then modify the output
-		return outputMod(rawFunc(...inputMod(...args)))
+		return outputMod(baseFunc(...inputMod(...args)))
 	}
 }
 

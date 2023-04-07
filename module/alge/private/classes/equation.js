@@ -1,5 +1,13 @@
+/* 
+	EQUATION
+
+	MECHANICAL CONSTRUCTOR
+
+*/
+
 import {Expression} from "../classes.js"
 import * as constants from "../constants.js"
+import { toString } from "../functions.js"
 
 export default class Equation {
 	//========================================================================================================================
@@ -36,8 +44,8 @@ export default class Equation {
 	operation = null;
 	left = null;
 	right = null;
-
-	constructor(mathString) {
+	
+	#stringConstructor(mathString) {
 		let sliced = this.#sliceAtExpressions(mathString);
 		let equation = sliced[0];
 		if (equation.length > 2) console.error("Equation cannot have more than two expressions! (Try system of equations!)");
@@ -47,11 +55,22 @@ export default class Equation {
 		this.right = new Expression(sliced[0][1]);
 		this.operation = constants.equalitySymbols.indexOf(sliced[1][0]);
 	}
+	#manualConstructor(left, right, operation) {
+		this.left = left;
+		this.right = right;
+		this.operation = operation;
+	}
+	constructor(...args) {
+		if (typeof args[0] === "string") this.#stringConstructor(...args)
+		else this.#manualConstructor(...args)
+	}
 
 	//========================================================================================================================
 	//-------------------------------------------------------------------------------------------------------------------getters
 	//========================================================================================================================
-
+	copy() {
+		return new Equation(toString.basic(this))
+	}
 
 	//========================================================================================================================
 	//-------------------------------------------------------------------------------------------------------------------modifiers

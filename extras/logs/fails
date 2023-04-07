@@ -1,3 +1,0 @@
-
-
-- doubleSidedSolve("28/r=4", "r") => 'r^-1 = 0.14285714285714285' EXPECTED: 'r = 7'

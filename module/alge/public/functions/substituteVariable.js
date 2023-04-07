@@ -36,6 +36,7 @@ function loop(anyClass) {
 
 export default function substituteVariable(anyClass, variableIndexInput, subInput) {
     debug.group("Substitute Variable", anyClass);
+    if (typeof variableIndexInput !== "number") debug.error("substituteVariable", "Variable index must be a number!")
     debug.log("Variable To Sub", constants.variables[variableIndexInput]);
     debug.log("Sub Value", subInput)
 

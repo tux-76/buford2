@@ -100,7 +100,6 @@ export function formatInputString(string) {
 		string = string.split(key).join(constants.specialCharactersReplacements[key])
 	}
 
-	debug.log("Format String", `"${string}"`);
 	return string
 }
 
