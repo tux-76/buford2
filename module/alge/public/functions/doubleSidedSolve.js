@@ -14,6 +14,8 @@
 import { debug, sort as bu2_sort, toString } from "../../private/functions.js";
 import { Coefficient, Term, Expression } from "../../private/classes.js";
 import * as constants from "../../private/constants.js"
+import "../config.js"
+import config from "../config.js";
 
 export default function doubleSidedSolve(equation, variable) {
 	debug.group("Double Sided Solve", equation);
@@ -23,17 +25,8 @@ export default function doubleSidedSolve(equation, variable) {
     //-----------------------------------------------------------------------------------------main
     //===========================================================================================
     function main() {
-        // Compression Setup
-        // compress both sides of the equation (distrubute, simplify)
-        equation.left.compress();
-        equation.right.compress();
-        debug.log("Compress both sides", equation)
-        
-        let mulitpleEquations = false
-        // Check for if there are multiple equations (or basically if theres a plus or minus)
-        equation.left.concat(equation.right).forEach(term => {
-            if (term.plusMinus) mulitpleEquations = true;
-        })
+        // Pre Phase: just gets it ready to be dealt with
+        prePhase();
 
         // Term Phase
         // moves no variable terms to the right, variable terms to the left
@@ -67,7 +60,23 @@ export default function doubleSidedSolve(equation, variable) {
         debug.groupEnd("Double Sided Solve", equation);
         return equation;
     }
+    //===========================================================================================
+    //------------------------------------------------------------------------------------term phase
+    //===========================================================================================
+    function prePhase() {
+        // Compression
+        // compress both sides of the equation (distrubute, simplify)
+        equation.left.compress();
+        equation.right.compress();
+        debug.log("Compress both sides", equation)
+        
+        // Check for if there are multiple equations (or basically if theres a plus or minus)
+        let mulitpleEquations = false
+        equation.left.concat(equation.right).forEach(term => {
+            if (term.plusMinus) mulitpleEquations = true;
+        })
 
+    }
 
     //===========================================================================================
     //------------------------------------------------------------------------------------term phase

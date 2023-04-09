@@ -4,10 +4,11 @@
 */
 
 import * as algeFunctions from "./module/alge/public/functions.js";
-import * as factor from "./module/factor/public/functions.js"
-import * as formulas from "./module/alge/public/formulas.js"
+import * as factor from "./module/factor/public/functions.js";
+import * as formulas from "./module/alge/public/formulas.js";
 import { debug } from "./module/alge/private/functions.js";
-
+import "./module/alge/public/config.js";
+import config from "./module/alge/public/config.js";
 
 
 
@@ -15,12 +16,17 @@ import { debug } from "./module/alge/private/functions.js";
 /*
 	Buford2 home structure setup
 
+	config: configuration
+		settings: The active settings
+		default: The default settings
 	alge:
 		An empty object, functions will be added with their inputs and outputs changed
+	factor:
+		All factor functions
 */
 let Buford2 = {};
 Buford2.factor = factor;
-
+Buford2.config = config;
 
 // =========================================================================================
 // -----------------------------------------------------------algebra function inputs and stuff
@@ -57,7 +63,7 @@ export default Buford2;
 console.log("Buford2 module exported.");
 
 /*
--------Written by Tux76-------
+-------Written by Jonas Blackwood-------
 
 Timeline:
 	-SAT 11:15 02/12/2022: Buford2 Algebra started
@@ -69,5 +75,5 @@ Timeline:
 	-MON 19:36 09/26/2022: We are now caught up to the first version of Buford in functionality! Yet this time with a long road of improvement ahead :)
 	-THU 19:52 10/06/2022: Attempt to change the structure to a more modular based approach. A little bit difficult because I don't know how to keep all the ties to other functions I've created. But it succeeded in the end.
 	-FRI 11:55 11/25/2022: Create rough dynamic site for Buford2 (Dynamic in updating with updates to "index.json"). Looking really classy at https://tux-76.github.io/buford2
-	-SUN 14:35 03/19/2023: New year! Also a month past Buford2's birthdate (more like conception date).
+	-SUN 14:35 03/19/2023: New year! Also a month past Buford2's birthdate (more like conception date I guess).
 */

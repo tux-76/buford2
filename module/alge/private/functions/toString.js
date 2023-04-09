@@ -1,6 +1,6 @@
 import * as classes from "../classes.js";
 import * as constants from "../constants.js";
-import { specialCharactersReplacements as SCHAR } from "../constants.js";
+import { specialCharacters as SCHAR } from "../constants.js";
 
 /*----------------------------------------------------------to string
 	MODES: "normal", "no constant", "no parenthesis"
@@ -32,7 +32,7 @@ export function basic(value, mode="normal") {
 		// For every term in the expression
 		value.forEach((term) => {
 			// Add operator
-			string += term.plusMinus ? SCHAR["+~-"] : "+";
+			string += term.plusMinus ? SCHAR["@+-"] : "+";
 			// Add the term to the string
 			string += basic(term);
 		}); 

@@ -1,6 +1,6 @@
 import * as constants from "../constants.js";
 import { debug } from "../functions.js";
-import { specialCharactersReplacements as SCHAR } from "../constants.js";
+import { specialCharacters as SCHAR } from "../constants.js";
 import * as classes from "../classes.js"
 
 /*
@@ -59,7 +59,7 @@ export function interpretMathString(mathString) {
 	}
 
 	// Check if there is a plus or minus
-	if (mathString[0] === SCHAR["+~-"]) { // Plus or minus
+	if (mathString[0] === SCHAR["@+-"]) { // Plus or minus
 		type.plusMinus = true
 		mathString = mathString.slice(1);
 	}
@@ -95,9 +95,9 @@ export function formatInputString(string) {
 	// Replace special characters
 	// For every special key combo, if it is in the string
 	// Note: the key is the special key combo (that can be typed on keyboard), the value is the special char
-	for (const key in constants.specialCharactersReplacements) if (string.includes(key)) {
+	for (const key in constants.specialCharacters) if (string.includes(key)) {
 		// Replace the special key combo with the special character
-		string = string.split(key).join(constants.specialCharactersReplacements[key])
+		string = string.split(key).join(constants.specialCharacters[key])
 	}
 
 	return string
