@@ -10,6 +10,6 @@ export default class MathBase {
     // ARGS:
     //   - iterables: Arrays or bases(numbers, varaibles)
     constructor(...iterables) {
-
+        
     }
 }
