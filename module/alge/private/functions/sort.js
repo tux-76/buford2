@@ -3,9 +3,8 @@ import * as classes from "../classes.js";
 import * as toString from "./toString.js";
 
 //------------------------------------------------------------sort
-export function sort(object) {
-	if (object instanceof classes.Variable || !isNaN(object)) return "number" //do not do anything to variables or numbers
-	else if (object instanceof classes.Coefficient) {
+export function sort(object) { //do not do anything to variables or numbers
+	if (object instanceof classes.Coefficient) {
 		sort(object.base);
 		sort(object.exponent);
 	}
@@ -15,6 +14,7 @@ export function sort(object) {
 		sortArrayObject(object.left);
 		sortArrayObject(object.right);
 	}
+	else if (object instanceof classes.Variable || !isNaN(object)) return "number"
 	else console.error("sort could not handle value:", object);
 }
 

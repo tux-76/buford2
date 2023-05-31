@@ -129,8 +129,8 @@ export default function doubleSidedSolve(equation, variable) {
             - Undistribute the variable side
             - Create a term without the factored expression and isolate the expression
             - Make sure:
-                1) The term that was factored out has a variable in it
-                2) The factored expression does NOT have a variable in it
+                1) The term that was factored out has the variable in it
+                2) The factored expression does NOT have the variable in it
                 EX: x(3+a): Good
             - If true: Move to factor phase
     */
