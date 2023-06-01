@@ -1,0 +1,17 @@
+This is the pseudo code for the double sided solve algorithm with examples
+
+BEGIN MAIN FUNCTION <= Equation, Variable (X)
+- Do PRE PHASE: Get everything ready
+    5(x+4) => 5x+20
+- Do TERM PHASE: Move terms with X to the left, terms without to the right
+    4+x=5x+8 => -4x=4
+
+- If the left side has only one term: (2x=8)
+    - Do FACTOR PHASE: Move all coefficients other than the variable to the right
+- Or if the left side has more than one term: (x^2+8x=7)
+    - Do SOLVE FOR MULTIPLE TERMS:
+
+- If the left side has only one coefficient:
+    - Do EXPONENT PHASE: Move the exponent of the variable to the left
+
+- Return the equation
