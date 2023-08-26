@@ -7,7 +7,7 @@ const arrowColorOut = "color: #1da588";
 const arrowColorIn = "color: #b144c9";
 const normalColor = "color: #878d94";
 
-let doDebug = true;
+let doDebug = false;
 
 export function log(title, output) {
 	if (doDebug) {

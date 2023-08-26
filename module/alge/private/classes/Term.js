@@ -2,7 +2,7 @@
 import * as constants from "../constants.js";
 import * as toMachine from "../functions/toMachine.js";
 import { toString, sort as bu2_sort } from "../functions.js";
-import {Coefficient, Expression} from "../classes.js";
+import { NumberValue, Coefficient, Expression} from "../classes.js";
 
 /*
 	TERM OBJECT
@@ -18,14 +18,14 @@ import {Coefficient, Expression} from "../classes.js";
 
 
 export default class Term {
-	//========================================================================================================================
-	//-----------------------------------------------------------------------------------------------------------------constructor
-	//========================================================================================================================
+	//===========================================================================
+	//-------------------------------------------------------------------constructor
+	//===========================================================================
 	
 	#sliceAtFactors(string) { //splice the term into it's factors
 		// console.log("Term string", string);
 
-		let symbolsAdded = '';
+		let strWithSymbols = '';
 		let splitStr = string.split('');
 		let lastType = 'none';
 		let parenStacks = 0;
@@ -44,26 +44,21 @@ export default class Term {
 				!['none', 'open paren'].includes(lastType) &&
 				parenStacks < 1
 			) {
-				symbolsAdded += '*';
+				strWithSymbols += '*';
 			}
 
-			symbolsAdded += char;
+			strWithSymbols += char;
 			lastType = thisType;
 
 			if (constants.parenthesis.includes(char)) parenStacks += (constants.parenthesis.slice(0, 3).includes(char)) ? 1 : -1
 		});
-		return toMachine.split(symbolsAdded, '*', '/')
+		return toMachine.split(strWithSymbols, '*', '/')
 	}//sliceAtFactors
 
-	//-------------------------------------------------------------------------------------------constructor
-	constant = 1;
-	coefficients = [];
-	plusMinus = false;
-
+	//-------------------------------------------------------------constructor
 	#stringConstuctor(mathString) {
 		let slices = this.#sliceAtFactors(mathString);
 		slices.forEach(factor => { //for all the factors of the term:
-			// console.log("factor", factor)
 			let factorType = toMachine.interpretMathString(factor);
 
 			// If the factor has a plus minus
@@ -83,12 +78,12 @@ export default class Term {
 			// Now determine what to do with the factor given, start off by asking if number
 			if (factorType.type === "num") {
 				if (factorType.influence === "div") { //if the number is divided: set to reciprocal
-					this.constant *= Math.pow(parseFloat(factor.slice(1)), -1); // constant * factor(without '/') ^ -1
+					this.constant.value *= Math.pow(parseFloat(factor.slice(1)), -1); // constant * factor(without '/') ^ -1
 				} else { //the number is just as is
-					this.constant *= parseFloat(factor);
+					this.constant.value *= parseFloat(factor);
 				}
 			} else if (factorType.type === "neg") {
-				this.constant *= -1
+				this.constant.value *= -1
 			} else {
 				this.coefficients.push(new Coefficient(factor));
 			}
@@ -101,15 +96,19 @@ export default class Term {
 	}
 
 	constructor(arg1, arg2) {
+		this.constant = new NumberValue(1);
+		this.coefficients = [];
+		this.plusMinus = false;
+
 		if (typeof arg1 === "string") this.#stringConstuctor(arg1);
 		else this.#manualConstructor(arg1, arg2);
 	}
 
 
 
-	//========================================================================================================================
+	//=====================================================================================
 	//-------------------------------------------------------------------------------------------------------------------getters
-	//========================================================================================================================
+	//=====================================================================================
 
 	//-----------------------------------------------------------------------------------------------has variable
 	hasVariable(variable=-1) {
@@ -124,7 +123,7 @@ export default class Term {
 	get isDistributable() {
 		let returnBool = 0;
 		this.coefficients.forEach(coef => {
-			if (coef.base instanceof Expression && coef.exponent === 1) returnBool = 1;
+			if (coef.base instanceof Expression && coef.exponent.value === 1) returnBool = 1;
 		});
 		return returnBool;
 	}
@@ -141,23 +140,23 @@ export default class Term {
 
 	
 
-	//========================================================================================================================
+	//=====================================================================================
 	//-------------------------------------------------------------------------------------------------------------------modifiers
-	//========================================================================================================================
+	//=====================================================================================
 	//-------------------------------------------------------------------------add
 	/*
 		- BOTH THIS AND TERM MUST BE SORTED
 		- COEFFICIENTS MUST BE THE SAME!
 	*/
 	add(term) {
-		this.constant += term.constant
-		this.coefficients.forEach((coef, i) => coef.exponent += term.coefficients[i].exponent);
+		this.constant.value += term.constant.value
+		this.coefficients.forEach((coef, i) => coef.exponent.value += term.coefficients[i].exponent.value);
 		bu2_sort.sort(this);
 	}
 
 	//--------------------------------------------------------------------------------------------------multiply
 	multiply(term) {
-		this.constant *= term.constant;
+		this.constant.value *= term.constant.value;
 		term.coefficients.forEach(coef => {
 			this.coefficients.push(new Coefficient(coef.base, coef.exponent));
 		});
@@ -166,45 +165,54 @@ export default class Term {
 
 	//-------------------------------------------------------------------------------------------------------simplify
 	simplify() {
+		// Simplify all the coefficients
 		this.coefficients.forEach(e => e.simplify());
+		// Filter out completely numerical coefficients
 		let coefs = this.coefficients.filter(coef => {
 			if (coef.isNumerical()) {
-				this.constant *= Math.pow(coef.base, coef.exponent);
+				// If it is numerical, calculate and multiply by constant
+				this.constant.value *= Math.pow(coef.base.value, coef.exponent.value);
 				return false;
 			} else return true;
 		});
 
+		// Combine coefficients with like bases
 		let simplified = [];
-		coefs.filter((coef, ci) => {
+		// For every coefficient
+		coefs.filter(coef => {
 			let matchFound = false;
+			// Loop through every Simplified Coefficient
 			for (let sci = 0; sci < simplified.length && !matchFound; sci++) {
 				let simpCoef = simplified[sci];
+				// Check if the bases are the same
 				if (toString.basic(coef.base) === toString.basic(simpCoef.base)) {
-					simpCoef.exponent += coef.exponent;
+					// If so, add the exponents
+					simpCoef.exponent.value += coef.exponent.value;
 					matchFound = true;
 				}
 			}
+			// If no match was found, add it to simplified
 			if (!matchFound) simplified.push(coef);
 		});
 		this.coefficients = simplified;
 		// remove meaningless coefficients
 		this.coefficients = this.coefficients.filter((coef) => {
-			if (coef.base === 1 || coef.exponent === 0) return false;
+			if (coef.base.value === 1 || coef.exponent.value === 0) return false;
 			else return true;
 		});
 		bu2_sort.sort(this);
 	}
 
-	//--------------------------------------------------------------------------------------------------------flatten exponent
+	//---------------------------------------------------------------------flatten exponent
 	flattenExponent(coefIndex) {
 		let coef = this.coefficients[coefIndex];
-		if (!isNaN(coef.exponent)) {
-			for (let i = 0; i < Math.abs(coef.exponent)-1; i++) {
+		if (coef.exponent instanceof NumberValue) {
+			for (let i = 0; i < Math.abs(coef.exponent.value)-1; i++) {
 				let newCoef = coef.copy();
-				newCoef.exponent = (coef.exponent > 0) ? 1 : -1;
+				newCoef.exponent.value = (coef.exponent.value > 0) ? 1 : -1;
 				this.coefficients.push(newCoef);
 			}
-			coef.exponent = (coef.exponent > 0) ? 1 : -1;
+			coef.exponent.value = (coef.exponent.value > 0) ? 1 : -1;
 		} else console.error("Flatten exponent only accepts numerical exponents.");
 		bu2_sort.sort(this);
 	}

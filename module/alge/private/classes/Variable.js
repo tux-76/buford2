@@ -8,4 +8,6 @@ export default class Variable {
 	get char() {
 		return constants.variables[this.index];
 	}
+
+	simplify() {}
 }

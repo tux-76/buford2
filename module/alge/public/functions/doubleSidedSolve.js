@@ -12,14 +12,13 @@
         - 
 */
 import { debug, sort as bu2_sort, toString } from "../../private/functions.js";
-import { Coefficient, Term, Expression } from "../../private/classes.js";
+import { NumberValue, Coefficient, Term, Expression } from "../../private/classes.js";
 import * as constants from "../../private/constants.js"
 import "../config.js"
 import config from "../config.js";
 
 export default function doubleSidedSolve(equation, variable) {
 	debug.group("Double Sided Solve", equation);
-
 
     //===========================================================================================
     //-----------------------------------------------------------------------------------------main
@@ -47,11 +46,11 @@ export default function doubleSidedSolve(equation, variable) {
 
         // Exponent Phase
         // If the above methods suceeded in isolating the variable from Terms, the constant of the variabled term, and Coefficients
-        if (equation.left.length === 1 && equation.left[0].constant === 1 && equation.left[0].coefficients.length === 1) {
+        if (equation.left.length === 1 && equation.left[0].constant.value === 1 && equation.left[0].coefficients.length === 1) {
             debug.log("The variable has been isolated from terms and coefficients")
             let variableCoef = equation.left[0].coefficients[0]
             // If the coef's exponent is NOT 1 (exponent of 1 means removing the exponent is pointless)
-            if (variableCoef.exponent !== 1) {
+            if (variableCoef.exponent.value !== 1) {
                 exponentPhase()
             }
         }
@@ -61,7 +60,7 @@ export default function doubleSidedSolve(equation, variable) {
         return equation;
     }
     //===========================================================================================
-    //------------------------------------------------------------------------------------term phase
+    //------------------------------------------------------------------------------------pre phase
     //===========================================================================================
     function prePhase() {
         // Compression
@@ -97,7 +96,7 @@ export default function doubleSidedSolve(equation, variable) {
             if (term.hasVariable(variable)) return true;
             else {
                 let termCopy = term.copy();
-                termCopy.constant *= -1;
+                termCopy.constant.value *= -1;
                 equation.right.push(termCopy);
             }
         });
@@ -111,7 +110,7 @@ export default function doubleSidedSolve(equation, variable) {
             if (!term.hasVariable(variable)) return true;
             else {
                 let termCopy = term.copy();
-                termCopy.constant *= -1;
+                termCopy.constant.value *= -1;
                 equation.left.push(termCopy);
             }
         });
@@ -143,7 +142,7 @@ export default function doubleSidedSolve(equation, variable) {
             // The factor expression is the expression in the target
             let factorExpression;
             // Create a new term without the expression coefficient
-            let factor = new Term(target.constant, target.coefficients.filter(coef => {
+            let factor = new Term(target.constant.value, target.coefficients.filter(coef => {
                 if (coef.base instanceof Expression) {
                     factorExpression = coef.base;
                     return 0;
@@ -181,8 +180,8 @@ export default function doubleSidedSolve(equation, variable) {
         let target = equation.left[0];
 
         // Divide both sides by the constant of the target
-        equation.right.forEach(rightTerm => rightTerm.constant /= target.constant);
-        target.constant = 1;
+        equation.right.forEach(rightTerm => rightTerm.constant.value /= target.constant.value);
+        target.constant.value = 1;
         debug.log("Move Target's Constant", equation);
 
         // Remove the coefs without the target variable in the target term
@@ -197,7 +196,7 @@ export default function doubleSidedSolve(equation, variable) {
         equation.right.forEach((term) => { 
             term.coefficients = term.coefficients.concat(removedCoefs.map(coef => {
                 let newCoef = coef.copy();
-                newCoef.exponent *= -1;
+                newCoef.exponent.value *= -1;
                 return newCoef;
             }));
         });
@@ -225,7 +224,7 @@ export default function doubleSidedSolve(equation, variable) {
 
         let variableCoef = equation.left[0].coefficients[0]
         // If the exponent is a number, not anything crazy like variables or expressions
-        if (typeof variableCoef.exponent === "number") {
+        if (variableCoef.exponent instanceof NumberValue) {
             // Raise the right side of the equation by the exponent
             // Create new coefficient with base as the right side and new exponent as reciprocal of variable exponent
             //   EX: 2a + b => Coef:(2a + b)^0.5
@@ -235,8 +234,8 @@ export default function doubleSidedSolve(equation, variable) {
             // Add a new term with the coefficient to the right side
             equation.right.push(new Term(1, [newRightSideCoef]))
             // Set the varible's exponent to 1
-            variableCoef.exponent = 1
-            debug.log(`Cancel power (${variableCoef.exponent}): Raise by right by reciprocal`, equation)
+            variableCoef.exponent.value = 1
+            debug.log(`Cancel power (${variableCoef.exponent.value}): Raise by right by reciprocal`, equation)
             // Simplify the right side
             equation.right.simplify()
             debug.log("Simplify", equation)

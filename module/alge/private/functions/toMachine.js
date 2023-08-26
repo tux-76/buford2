@@ -44,7 +44,23 @@ export function split(string, exclusiveChars=[], inclusiveChars=[]) {
 	return output.concat([block]).filter(e => e !== '');
 }
 
-//-------------------------------------------------------------------------------identify string
+//----------------------------------------------identify string
+// DESC: identifies the input string
+// 
+// TYPE
+// | - influence
+// | - type
+// | - plusMinus: bool
+// 
+// Influence values:
+//   -"div": There is a division sign before it
+// 
+// Type values:
+//   -"emp": Empty string
+//   -"num": Numerical
+//   -"var": Is a character that is a valid variable
+//   -"expr": Expression: Has a parenthesis at the start and end
+//   -"non": I dont know what it is
 export function interpretMathString(mathString) {
 	let type = {
 		influence: "nul",
@@ -72,13 +88,13 @@ export function interpretMathString(mathString) {
 	} else if (constants.variables.includes(mathString)) {
 		type.type = "var";
 	} else if (constants.parenthesis.includes(mathString[0]) && constants.parenthesis.includes(mathString[mathString.length-1])) {
-		type.type = "exp";
+		type.type = "expr";
 	} else if (mathString === '-') {
 		type.type = "neg"
 	} else {
 		type.type = "non";
 	}
-	return type
+	return type;
 }
 
 // Formats the input string to a certain extent to allow for easier interpretation (remove spaces and stuff like that)
@@ -108,11 +124,11 @@ export function formatInputString(string) {
  *
  * MODES:
  * - "all": Includes all classes
- * - "coef friendly": The classes a coefficient can have as bases and exponents (float, variable, expression)
+ * - "coef friendly": Only return classes a coefficient can have as bases and exponents (float, variable, expression)
  */  
 export function translate(string, mode="all") {
-	// If the string is just a number (straight numbers wont error)
-	if (!isNaN(string)) return parseFloat(string)
+	// If the string is just a number
+	if (!isNaN(string)) return new classes.NumberValue(string)
 	// If the string is a just a variable
 	if (constants.variables.includes(string)) return new classes.Variable(string)
 
@@ -133,7 +149,7 @@ export function translate(string, mode="all") {
 	// More than one equal sign, means a system of equations is needed
 	else if (expressionsCount > 2) debug.error(`No support for system of equations`, `${expressionsCount} expressions found in ${string}`)
 
-	// FROM THIS POINT ON: everything from Expressions down
+	// FROM THIS POINT ON: input string is an expression, not an equation
 	// Create "onion class". Will "peel" the onion until the best fit class is found
 	let onionClass = new classes.Expression(string);
 	// If we are using coefficient friendly values and it is not number or string, then it must be Expression
@@ -149,8 +165,11 @@ export function translate(string, mode="all") {
 	// The idea for the if block below is that if we have to add the constant to the coef count if it is not one and the coef
 	//   count needs to be greater than one to keep the term
 	// If const = 1 and coef > 1 or const != 1 and coef > 0
-	if ((onionClass.constant===1 && onionClass.coefficients.length>1) || (onionClass.constant!==1 && onionClass.coefficients.length>0))
-		return onionClass
+	if (
+		(onionClass.constant.value === 1 && onionClass.coefficients.length>1) || 
+		(onionClass.constant.value !== 1 && onionClass.coefficients.length>0)
+	) return onionClass
+	
 	else onionClass = new classes.Coefficient(string)
 
 	// This is the last return, the string should be in its lowest ranking class right now (other than the easy ones up top)

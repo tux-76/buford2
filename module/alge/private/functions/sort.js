@@ -14,7 +14,7 @@ export function sort(object) { //do not do anything to variables or numbers
 		sortArrayObject(object.left);
 		sortArrayObject(object.right);
 	}
-	else if (object instanceof classes.Variable || !isNaN(object)) return "number"
+	else if (object instanceof classes.Variable || object instanceof classes.NumberValue) return "base"
 	else console.error("sort could not handle value:", object);
 }
 

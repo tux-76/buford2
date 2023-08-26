@@ -6,22 +6,22 @@ import { specialCharacters as SCHAR } from "../constants.js";
 	MODES: "normal", "no constant", "no parenthesis"
 */
 export function basic(value, mode="normal") {
-	if (!isNaN(value)) return value.toString();
+	if (value instanceof classes.NumberValue) return value.value.toString();
 
 	else if (value instanceof classes.Variable) return value.char;
 
-	else if (value instanceof classes.Coefficient) return basic(value.base) + ((value.exponent !== 1) ? ("^" + basic(value.exponent)) : "");
+	else if (value instanceof classes.Coefficient) return basic(value.base) + ((value.exponent.value !== 1) ? ("^" + basic(value.exponent)) : "");
 
 	else if (value instanceof classes.Term) {
 		// Create the string with the constant number in it
 		// Constant number is only shown when: The constant isn't 1 OR when there are no coefficients, 
 		// Also the mode musn't be "no constant"
-		let string = ((value.constant !== 1 || value.coefficients.length < 1) && !(mode === "no constant")) ? basic(value.constant) : ""; 
+		let string = ((value.constant.value !== 1 || value.coefficients.length < 1) && !(mode === "no constant")) ? basic(value.constant) : ""; 
 		// Add the coefficients
 		value.coefficients.forEach((coef) => {
 			// If the coefficient's base is a number and there is something before it, add a *
-			// **This is because implied multiplication works with 4*a (4a) but not 4*5 (45)**
-			if (!isNaN(coef.base) && string.length > 0) string += "*";
+			// **This is because implied multiplication works with 4*a (= 4a) but not 4*5 (!= 45) **
+			if (coef.base instanceof classes.NumberValue && string.length > 0) string += "*";
 			string += basic(coef);
 		});
 		return string;

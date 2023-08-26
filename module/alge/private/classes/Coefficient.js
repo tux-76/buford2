@@ -1,12 +1,12 @@
-import { Variable, Term, Expression } from "../classes.js";
+import { Variable, Term, Expression, NumberValue } from "../classes.js";
 import * as toMachine from "../functions/toMachine.js";
 import * as toString from "../functions/toString.js";
 
 
 export default class Coefficient {
-	//========================================================================================================================
+	//=====================================================================================
 	//-----------------------------------------------------------------------------------------------------------------constructor
-	//========================================================================================================================
+	//=====================================================================================
 	
 	#sliceAtExponent(string) {
 		let split = toMachine.split(string, '^', '#');
@@ -27,38 +27,28 @@ export default class Coefficient {
 		
 		// Handle Exponent Str
 		let exponentType = toMachine.interpretMathString(exponentStr);
-		// If the exponent is just a straight number then parse it
-		if (exponentType.type === "num") this.exponent = parseFloat(exponentStr);
-		// If there is no exponent just set it to one
-		else if (exponentType.type === "emp") this.exponent = 1;
-		// If the exponent is a variable set it to a variable object
-		else if (exponentType.type === "var") this.exponent = new Variable(exponentStr);
-		// If the type is unknown
-		else if (exponentType.type === "non") console.error(`Input error for string "${exponentStr}": I have no clue what this is!`);
-		// If the type is known but unsupported
-		else console.error(`Input error for string "${exponentStr}": Type ${exponentType.type} is not supported!`)
+		if (exponentType.type === "emp")
+			this.exponent = new NumberValue(1)
+		else
+			this.exponent = toMachine.translate(exponentStr)
 
 		//handle base str division
 		let baseType = toMachine.interpretMathString(baseStr);
 		if (baseType.influence === "div") { //if division
 			baseStr = baseStr.slice(1) //remove sign
-			if (!isNaN(this.exponent)) { //if exponent is number
-				this.exponent *= -1; //invert
+			if (this.exponent instanceof NumberValue) { //if exponent is number
+				this.exponent.value *= -1; //invert
 			} else { //if not number
 
 			}
 		}
 
 		//handle base str
-		if (baseType.type === "num") {
-			this.base = parseFloat(baseStr)
-		} else if (baseType.type === "var") {
-			this.base = new Variable(baseStr);
-		} else if (baseType.type === "exp") {
-			this.base = new Expression(baseStr.slice(1, baseStr.length-1));
-		} else if (baseType.type === "neg") {
-			this.base = -1;
-		} else console.error(`Input error for string "${baseStr}": Type ${baseType.type} is not supported!`);
+		if (baseType.type === "neg") {
+			this.base = new NumberValue(-1);
+		} else {
+			this.base = toMachine.translate(baseStr)
+		}
 	}
 	#manualConstructor(base, exponent) {
 		this.base = base;
@@ -70,9 +60,9 @@ export default class Coefficient {
 	}
 
 
-	//========================================================================================================================
+	//=====================================================================================
 	//-------------------------------------------------------------------------------------------------------------------getters
-	//========================================================================================================================
+	//=====================================================================================
 
 	//---------------------------------------------------------------has variable
 	hasVariable(variable=-1) {
@@ -94,16 +84,17 @@ export default class Coefficient {
 	}
 
 	//---------------------------------------------------------------is numerical
-	isNumerical() {return (!isNaN(this.base) && !isNaN(this.exponent))}; //determines if coefficient has objects or variables
+	isNumerical() {return (this.base instanceof NumberValue && this.exponent instanceof NumberValue)}; //determines if coefficient has objects or variables
 
 	
-	//========================================================================================================================
-	//-------------------------------------------------------------------------------------------------------------------modifiers
-	//========================================================================================================================
+	//=====================================================================================
+	//-----------------------------------------------------------------------------------modifiers
+	//=====================================================================================
 
 	//----------------------------------------------------------------simplify
 	simplify() {
-		// check if unnecessary expression is present and remove if so
+		// Check if unnecessary expression is present and remove if so
+		// Expressions that are just a coefficient (one term, that term has no coefficients)
 		if (this.base instanceof Expression) if (this.base.length === 1) {
 			let term = this.base[0];
 			if (term.coefficients.length === 0) {
@@ -111,7 +102,7 @@ export default class Coefficient {
 			}
 		}
 
-		if (isNaN(this.base) && !(this.base instanceof Variable)) this.base.simplify();
-		if (isNaN(this.exponent) && !(this.exponent instanceof Variable)) this.exponent.simplify();
+		this.base.simplify()
+		this.exponent.simplify()
 	}
 }

@@ -5,9 +5,9 @@ import { GCF } from "../../../factor/public/functions.js";
 import { specialCharacters as SCHAR } from "../constants.js";
 
 export default class Expression extends Array {
-	//==========================================================================================================
+	//=======================================================================
 	//----------------------------------------------------------------------------------------------------constructor
-	//==========================================================================================================
+	//=======================================================================
 	
 	#sliceAtTerms(string) { //splice the string where there is a '+'(exclusive) or '-'(inclusive)
 		return toMachine.split(string, '+', ['-', SCHAR["@+-"]]);
@@ -34,9 +34,9 @@ export default class Expression extends Array {
 	}
 
 
-	//===========================================================================================================
+	//========================================================================
 	//-----------------------------------------------------------------------------------------------------getters
-	//===========================================================================================================
+	//========================================================================
 
 	//------------------------------------------------------------------------------------------has variable
 	hasVariable(variable=-1) {
@@ -52,9 +52,9 @@ export default class Expression extends Array {
 		return new Expression(toString.basic(this).slice(1, -1));
 	}
 
-	//=======================================================================================================
+	//====================================================================
 	//----------------------------------------------------------------------------------------------------modifiers
-	//=======================================================================================================
+	//====================================================================
 
 	//--------------------------------------------------------------------------------------------------buford sort
 	bufordSort() {
@@ -76,7 +76,7 @@ export default class Expression extends Array {
 			for (let i = 0; (i < simplified.length) && !matchFound; i++) {
 				let simpTerm = simplified[i];
 				if (term.compareTerms(simpTerm)) {
-					simpTerm.constant += term.constant;
+					simpTerm.constant.value += term.constant.value;
 					matchFound = true;
 				}
 			}
@@ -86,7 +86,7 @@ export default class Expression extends Array {
 		simplified.forEach(simpTerm => this.push(simpTerm));
 		//remove meaningless terms
 		this.slice().forEach(term => {
-			if (term.constant === 0) this.splice(this.indexOf(term), 1);
+			if (term.constant.value === 0) this.splice(this.indexOf(term), 1);
 		});
 
 		this.bufordSort();
@@ -100,7 +100,7 @@ export default class Expression extends Array {
 		//get the index of the expression within the term
 		let expressionIndex = null;
 		for (let i = 0; i < term.coefficients.length && expressionIndex === null; i++) {
-			if (term.coefficients[i].base instanceof Expression && term.coefficients[i].exponent === 1) expressionIndex = i;
+			if (term.coefficients[i].base instanceof Expression && term.coefficients[i].exponent.value === 1) expressionIndex = i;
 		}
 		// flag if exponent of expression is not 1
 		let expression = term.coefficients[expressionIndex].base; term.coefficients.splice(expressionIndex, 1);
@@ -165,7 +165,7 @@ export default class Expression extends Array {
 		// Set the new term's constant to the GCF of all the constants of the terms being undistributed
 		let newTerm = new Term(GCF(...terms.map(term => term.constant)));
 		// Divide each of the terms being undistributed by this GCF (newTerm.constant)
-		terms.forEach((term) => term.constant /= newTerm.constant);
+		terms.forEach((term) => term.constant.value /= newTerm.constant.value);
 
 		// Find the common coefficients (I call them bases here for some reason)
 		// Get the bases of the first term. These will be used to compare to all the other terms.
@@ -179,7 +179,7 @@ export default class Expression extends Array {
 
 		// Determine whether to continue.
 		// If there was no common coefficients or any GCF
-		if (commonBases.length === 0 && newTerm.constant === 1) {
+		if (commonBases.length === 0 && newTerm.constant.value === 1) {
 			debug.groupEnd("Undistribute canceled: No common factors");
 			return 1;
 		}
